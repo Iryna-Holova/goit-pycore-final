@@ -2,6 +2,8 @@
 Main module.
 """
 
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
 from serialize import save_data, load_data
 from cotrollers import (
     add_contact,
@@ -30,8 +32,17 @@ def main():
     """
     book = load_data()
     print("Welcome to the assistant bot!")
+
+    commands = [command for command in controllers]
+    commands_completer = WordCompleter(commands)
+
     while True:
-        command = input("Enter a command: ").strip().lower()
+        try:
+            command = prompt('Enter a command: ', completer=commands_completer).strip().lower()
+        except KeyboardInterrupt:
+            print("Good bye!")
+            save_data(book)
+            break
 
         if command in ["close", "exit"]:
             print("Good bye!")
