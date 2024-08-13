@@ -2,9 +2,9 @@
 Main module.
 """
 
-from prompt_toolkit import prompt
-from prompt_toolkit.completion import WordCompleter
+from prompt_toolkit import PromptSession
 from serialize import save_data, load_data
+from completer import CustomCompleter
 from cotrollers import (
     add_contact,
     change_contact,
@@ -34,11 +34,13 @@ def main():
     print("Welcome to the assistant bot!")
 
     commands = [command for command in controllers]
-    commands_completer = WordCompleter(commands)
+    session = PromptSession()
 
     while True:
         try:
-            command = prompt('Enter a command: ', completer=commands_completer).strip().lower()
+            command = session.prompt('Enter a command: ',
+                completer=CustomCompleter(commands),
+                mouse_support=True).strip().lower()
         except KeyboardInterrupt:
             print("Good bye!")
             save_data(book)
