@@ -33,7 +33,7 @@ def main():
     book = load_data()
     print("Welcome to the assistant bot!")
 
-    commands = [command for command in controllers]
+    commands = list(controllers) + ["close", "exit"]
     session = PromptSession()
 
     while True:
@@ -45,6 +45,9 @@ def main():
             print("Good bye!")
             save_data(book)
             break
+
+        if not command:
+            continue
 
         if command in ["close", "exit"]:
             print("Good bye!")

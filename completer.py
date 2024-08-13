@@ -9,7 +9,6 @@ class CustomCompleter(Completer):
         self.commands = commands
 
     def get_completions(self, document, complete_event):
-        # print(complete_event)
         for command in self.commands:
             if command[:len(document.current_line)] != document.current_line:
                 continue
