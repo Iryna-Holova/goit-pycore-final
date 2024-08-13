@@ -127,4 +127,5 @@ class Record:
         self.birthday = Birthday(birthday)
 
     def __str__(self):
-        return f"📞 name: {self.name.value:10} phones: {'; '.join(str(phone) for phone in self.phones)}"
+        phones_str = "; ".join(str(phone) for phone in self.phones)
+        return f"📞 name: {self.name.value:10} phones: {phones_str}"
