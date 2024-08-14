@@ -1,10 +1,11 @@
 """
 Main module.
 """
-from helpers.colors import green, danger,success
+from helpers.colors import green, danger, success
 from prompt_toolkit import PromptSession
 from helpers.serialize import save_data, load_data
-from helpers.completer import CustomCompleter, suggest_command
+from helpers.suggest import suggest_command
+from helpers.completer import CustomCompleter
 from controllers import (
     add_contact,
     change_contact,
