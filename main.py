@@ -4,7 +4,7 @@ Main module.
 
 from prompt_toolkit import PromptSession
 from serialize import save_data, load_data
-from completer import CustomCompleter
+from helpers.completer import CustomCompleter
 from cotrollers import (
     add_contact,
     change_contact,
