@@ -1,7 +1,7 @@
 """
 Main module.
 """
-
+from helpers.colors import green, danger,success
 from prompt_toolkit import PromptSession
 from helpers.serialize import save_data, load_data
 from helpers.completer import CustomCompleter, suggest_command
@@ -31,7 +31,7 @@ def main():
     The main function that serves as the entry point for the application.
     """
     book = load_data()
-    print("Welcome to the assistant bot!")
+    print(success("Welcome to the assistant bot!"))
 
     commands = list(controllers) + ["close", "exit"]
     session = PromptSession()
@@ -61,14 +61,14 @@ def main():
             break
 
         if command == "hello":
-            print("How can I help you?")
+            print(green("How can I help you?"))
 
         elif command in controllers:
             print(controllers[command](book))
 
         else:
             similar_commands = suggest_command(command, commands)
-            print("Invalid command.")
+            print(danger("Invalid command."))
             if similar_commands and similar_commands != command:
                 print("The most similar commands are")
                 for cmd in similar_commands:
