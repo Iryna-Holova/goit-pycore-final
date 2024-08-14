@@ -46,3 +46,4 @@ class Phone:
             bool: True if the Phone instances are equal, False otherwise.
         """
         return isinstance(other, Phone) and self.value == other.value
+

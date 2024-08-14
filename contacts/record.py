@@ -6,6 +6,7 @@ from typing import List
 from contacts.name import Name
 from contacts.birthday import Birthday
 from contacts.phone import Phone
+from contacts.address import Address
 
 
 class Record:
@@ -31,6 +32,7 @@ class Record:
         self.name = Name(contact_name)
         self.phones: List[Phone] = []
         self.birthday: Birthday | None = None
+        self.address: Address | None = None
 
     def add_phone(self, phone: str) -> None:
         """
@@ -126,6 +128,19 @@ class Record:
         """
         self.birthday = Birthday(birthday)
 
+    def add_address(self, address: str) -> None:
+        """
+        Adds an address to the record.
+
+        Args:
+            address (str): The address to be added.
+
+        Returns:
+            None
+        """
+        self.address = Address(address) 
+
     def __str__(self):
         phones_str = "; ".join(str(phone) for phone in self.phones)
-        return f"📞 name: {self.name.value:10} phones: {phones_str}"
+        address_str = str(self.address) if self.address else "N/A"
+        return f"📞 name: {self.name.value:10} phones: {phones_str} address: {address_str}"
