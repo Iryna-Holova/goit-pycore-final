@@ -2,7 +2,9 @@
 Main module.
 """
 
+from prompt_toolkit import PromptSession
 from serialize import save_data, load_data
+from helpers.completer import CustomCompleter
 from cotrollers import (
     add_contact,
     change_contact,
@@ -30,8 +32,22 @@ def main():
     """
     book = load_data()
     print("Welcome to the assistant bot!")
+
+    commands = list(controllers) + ["close", "exit"]
+    session = PromptSession()
+
     while True:
-        command = input("Enter a command: ").strip().lower()
+        try:
+            command = session.prompt('Enter a command: ',
+                completer=CustomCompleter(commands),
+                mouse_support=True).strip().lower()
+        except KeyboardInterrupt:
+            print("Good bye!")
+            save_data(book)
+            break
+
+        if not command:
+            continue
 
         if command in ["close", "exit"]:
             print("Good bye!")
