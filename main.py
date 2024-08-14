@@ -1,9 +1,10 @@
 """
 Main module.
 """
-from helpers.colors import green, danger,success
+from helpers.colors import green, danger, success
 from prompt_toolkit import PromptSession
 from helpers.serialize import save_data, load_data
+from helpers.suggest import suggest_command
 from helpers.completer import CustomCompleter
 from controllers import (
     add_contact,
@@ -67,7 +68,12 @@ def main():
             print(controllers[command](book))
 
         else:
+            similar_commands = suggest_command(command, commands)
             print(danger("Invalid command."))
+            if similar_commands and similar_commands != command:
+                print("The most similar commands are")
+                for cmd in similar_commands:
+                    print(f"\t'{cmd}'")
 
 
 if __name__ == "__main__":
