@@ -4,7 +4,7 @@ Main module.
 
 from prompt_toolkit import PromptSession
 from helpers.serialize import save_data, load_data
-from helpers.completer import CustomCompleter
+from helpers.completer import CustomCompleter, suggest_command
 from controllers import (
     add_contact,
     change_contact,
@@ -67,7 +67,12 @@ def main():
             print(controllers[command](book))
 
         else:
+            similar_commands = suggest_command(command, commands)
             print("Invalid command.")
+            if similar_commands and similar_commands != command:
+                print("The most similar commands are")
+                for cmd in similar_commands:
+                    print(f"\t'{cmd}'")
 
 
 if __name__ == "__main__":
