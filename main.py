@@ -3,9 +3,9 @@ Main module.
 """
 
 from prompt_toolkit import PromptSession
-from serialize import save_data, load_data
+from helpers.serialize import save_data, load_data
 from helpers.completer import CustomCompleter
-from cotrollers import (
+from controllers import (
     add_contact,
     change_contact,
     get_phones,
@@ -38,9 +38,15 @@ def main():
 
     while True:
         try:
-            command = session.prompt('Enter a command: ',
-                completer=CustomCompleter(commands),
-                mouse_support=True).strip().lower()
+            command = (
+                session.prompt(
+                    "Enter a command: ",
+                    completer=CustomCompleter(commands),
+                    mouse_support=True,
+                )
+                .strip()
+                .lower()
+            )
         except KeyboardInterrupt:
             print("Good bye!")
             save_data(book)

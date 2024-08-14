@@ -1,7 +1,7 @@
 """
-Cotrollers module.
+Controllers module.
 
-The cotrollers module contains functions that interact with the user and
+The controllers module contains functions that interact with the user and
 modify the address book.
 """
 
