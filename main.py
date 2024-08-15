@@ -14,6 +14,10 @@ from controllers import (
     add_birthday,
     show_birthday,
     birthdays,
+    add_email,
+    show_email,
+    edit_email,
+    remove_email,
 )
 
 controllers = {
@@ -24,6 +28,10 @@ controllers = {
     "add-birthday": add_birthday,
     "show-birthday": show_birthday,
     "birthdays": birthdays,
+    "add-email": add_email,
+    "show-email": show_email,
+    "edit-email": edit_email,
+    "remove-email": remove_email,
 }
 
 

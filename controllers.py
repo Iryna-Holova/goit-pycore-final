@@ -148,3 +148,81 @@ def birthdays(book: AddressBook) -> str:
         contacts in the `book` who have a birthday within the next 7 days.
     """
     return "\n".join([str(record) for record in book.get_upcoming_birthdays()])
+
+@input_error
+def add_email(book: AddressBook) -> str:
+    """
+    Adds an email to the contact with the given name in the `book`.
+
+    Args:
+        book (AddressBook): An instance of the `AddressBook` class.
+
+    Returns:
+        str: A message indicating whether the email was added or if the
+        input is invalid.
+    """
+    name = input("Enter name: ")
+    email = input("Enter email: ")
+
+    record = book.find(name)
+    record.add_email(email)
+    return "✅ Email added."
+
+
+@input_error
+def show_email(book: AddressBook) -> str:
+    """
+    Shows the email of the contact with the given name in the `book`.
+
+    Args:
+        book (AddressBook): An instance of the `AddressBook` class.
+
+    Returns:
+        str: A string containing the email of the contact with the given
+        name.
+    """
+    name = input("Enter name: ")
+
+    record = book.find(name)
+    return "\n".join([str(email) for email in record.emails])
+
+
+@input_error
+def edit_email(book: AddressBook) -> str:
+    """
+    Edits an existing email in the contact's record.
+
+    Args:
+        book (AddressBook): An instance of the `AddressBook` class.
+
+    Returns:
+        str: A message indicating whether the email was updated or if the
+        input is invalid.
+    """
+    name = input("Enter name: ")
+    old_email = input("Enter old email: ")
+    new_email = input("Enter new email: ")
+
+    record = book.find(name)
+    record.edit_email(old_email, new_email)
+    return "✅ Email updated."
+
+
+@input_error
+def remove_email(book: AddressBook) -> str:
+    """
+    Removes an email from the contact's record.
+
+    Args:
+        book (AddressBook): An instance of the `AddressBook` class.
+
+    Returns:
+        str: A message indicating whether the email was removed or if the
+        input is invalid.
+    """
+    name = input("Enter name: ")
+    email = input("Enter email to remove: ")
+
+    record = book.find(name)
+    record.remove_email(email)
+    return "✅ Email removed."

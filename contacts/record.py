@@ -6,6 +6,7 @@ from typing import List
 from contacts.name import Name
 from contacts.birthday import Birthday
 from contacts.phone import Phone
+from contacts.email import Email
 
 
 class Record:
@@ -31,6 +32,7 @@ class Record:
         self.name = Name(contact_name)
         self.phones: List[Phone] = []
         self.birthday: Birthday | None = None
+        self.emails: List[Email] = []
 
     def add_phone(self, phone: str) -> None:
         """
@@ -126,6 +128,88 @@ class Record:
         """
         self.birthday = Birthday(birthday)
 
+    def add_email(self, email: str) -> None:
+        """
+        Adds a new email address to the record.
+
+        Args:
+            email (str): The email address to add.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If the email address already exists in the record.
+        """
+        new_email = Email(email)
+        if new_email in self.emails:
+            raise ValueError(f"❌ Email {email} already exists")
+        self.emails.append(new_email)
+
+    def remove_email(self, email: str) -> None:
+        """
+        Removes an email address from the list of emails in the `Record` instance.
+
+        Args:
+            email (str): The email address to remove.
+
+        Raises:
+            ValueError: If the email address is not found in the list of emails.
+
+        Returns:
+            None
+        """
+        email_to_remove = Email(email)
+        if email_to_remove in self.emails:
+            self.emails.remove(email_to_remove)
+        else:
+            raise ValueError(f"❌ Email address {email} not found")
+
+    def edit_email(self, old_email: str, new_email: str) -> None:
+        """
+        Edits an email address in the record.
+
+        Args:
+            old_email (str): The email address to be replaced.
+            new_email (str): The new email address.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If the old email address is not found or the new email
+            address already exists.
+        """
+        old_field = Email(old_email)
+        try:
+            email_index = next(
+                i for i, email in enumerate(self.emails) if email == old_field
+            )
+        except StopIteration as exc:
+            raise ValueError(f"❌ Email address {old_email} not found") from exc
+        new_field = Email(new_email)
+        if new_field in self.emails:
+            raise ValueError(f"❌ Email {new_email} already exists")
+        self.emails[email_index] = new_field
+
+    def find_email(self, email: str) -> Email:
+        """
+        Finds an email address in the record.
+
+        Args:
+            email (str): The email address to find.
+
+        Returns:
+            Email: The found email address.
+
+        Raises:
+            ValueError: If the email address is not found.
+        """
+        if Email(email) in self.emails:
+            return Email(email)
+        raise ValueError(f"❌ Email address {email} not found")
+
     def __str__(self):
         phones_str = "; ".join(str(phone) for phone in self.phones)
-        return f"📞 name: {self.name.value:10} phones: {phones_str}"
+        emails_str = "; ".join(str(email) for email in self.emails)
+        return f"📞 name: {self.name.value:10} phones: {phones_str} emails: {emails_str}"
