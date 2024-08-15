@@ -15,7 +15,7 @@ class Birthday:
             birthday = datetime.strptime(value, "%d.%m.%Y").date()
             self.value = birthday
         except ValueError as exc:
-            raise ValueError("❌ Invalid date format. Use DD.MM.YYYY") from exc
+            raise ValueError("Invalid date format. Use DD.MM.YYYY") from exc
 
     def __str__(self) -> str:
         return self.value.strftime("%d.%m.%Y")

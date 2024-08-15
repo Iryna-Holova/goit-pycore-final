@@ -3,28 +3,28 @@ Main module.
 """
 
 from prompt_toolkit import PromptSession
-from helpers.serialize import save_data, load_data
+from helpers.suggest import suggest_command
 from helpers.completer import CustomCompleter
+from helpers.serialize import save_data, load_data
+from helpers.colors import green, danger, success
 from controllers import (
     add_contact,
     change_contact,
-    get_phones,
     get_contacts,
-    add_birthday,
-    show_birthday,
     birthdays,
     add_note
+    delete_contact,
+    fake_contacts,
 )
 
 controllers = {
-    "add": add_contact,
-    "change": change_contact,
-    "phone": get_phones,
-    "all": get_contacts,
-    "add-birthday": add_birthday,
-    "show-birthday": show_birthday,
+    "add-contact": add_contact,
+    "change-contact": change_contact,
+    "delete-contact": delete_contact,
+    "all-contacts": get_contacts,
     "birthdays": birthdays,
     "add-note": add_note
+    "fake-contacts": fake_contacts,
 }
 
 
@@ -33,7 +33,7 @@ def main():
     The main function that serves as the entry point for the application.
     """
     book = load_data()
-    print("Welcome to the assistant bot!")
+    print(success("Welcome to the assistant bot!"))
 
     commands = list(controllers) + ["close", "exit"]
     session = PromptSession()
@@ -63,13 +63,18 @@ def main():
             break
 
         if command == "hello":
-            print("How can I help you?")
+            print(green("How can I help you?"))
 
         elif command in controllers:
             print(controllers[command](book))
 
         else:
-            print("Invalid command.")
+            similar_commands = suggest_command(command, commands)
+            print(danger("Invalid command."))
+            if similar_commands and similar_commands != command:
+                print("The most similar commands are")
+                for cmd in similar_commands:
+                    print(f"\t'{cmd}'")
 
 
 if __name__ == "__main__":
