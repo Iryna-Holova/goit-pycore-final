@@ -5,9 +5,11 @@ The controllers module contains functions that interact with the user and
 modify the address book.
 """
 
+
 from decorators.input_error import input_error
 from contacts.address_book import AddressBook
 from contacts.record import Record
+
 
 
 @input_error
@@ -148,3 +150,40 @@ def birthdays(book: AddressBook) -> str:
         contacts in the `book` who have a birthday within the next 7 days.
     """
     return "\n".join([str(record) for record in book.get_upcoming_birthdays()])
+
+@input_error
+def add_address(book: AddressBook) -> str:
+    """
+    Adds an address to the contact with the given name in the `book`.
+
+    Args:
+        book (AddressBook): An instance of the `AddressBook` class.
+
+    Returns:
+        str: A message indicating whether the address was added or if the
+        input is invalid.
+    """
+    name = input("Enter name: ")
+    address = input("Enter address: ")
+
+    record = book.find(name)
+    record.add_address(address)
+    return "✅ Address added."
+
+
+@input_error
+def show_address(book: AddressBook) -> str:
+    """
+    Shows the address of the contact with the given name in the `book`.
+
+    Args:
+        book (AddressBook): An instance of the `AddressBook` class.
+
+    Returns:
+        str: A string containing the address of the contact with the given
+        name.
+    """
+    name = input("Enter name: ")
+
+    record = book.find(name)
+    return f"🏠 Address: {record.address}"

@@ -6,6 +6,8 @@ from prompt_toolkit import PromptSession
 from helpers.serialize import save_data, load_data
 from helpers.suggest import suggest_command
 from helpers.completer import CustomCompleter
+from contacts.address import Address
+
 from controllers import (
     add_contact,
     change_contact,
@@ -14,6 +16,8 @@ from controllers import (
     add_birthday,
     show_birthday,
     birthdays,
+    add_address,
+    show_address,
 )
 
 controllers = {
@@ -24,6 +28,8 @@ controllers = {
     "add-birthday": add_birthday,
     "show-birthday": show_birthday,
     "birthdays": birthdays,
+    "add-address": add_address,
+    "show-address": show_address,
 }
 
 
