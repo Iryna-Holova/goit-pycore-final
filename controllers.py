@@ -301,3 +301,32 @@ def fake_contacts(book: AddressBook) -> str:
         book.add_record(record)
 
     return success(f"{count} fake contacts added.")
+
+
+def search_contacts(book: AddressBook) -> str:
+    """
+    Searches for contacts in the `book` that match the given search term.
+
+    Args:
+        book (AddressBook): An instance of the `AddressBook` class.
+
+    Returns:
+        str: A string containing the names and phone numbers of all contacts
+        in the `book` that match the given search term.
+    """
+    while True:
+        search_term = input(blue("Enter search term (name or phone number): "))
+        if search_term.lower() == "q":
+            return danger("Operation canceled.")
+        if not search_term:
+            print(warning("Invalid input. Please enter a valid search term or q to exit"))
+            continue
+
+        results = book.search(search_term)
+        if results:
+            return "\n".join([display_contact(contact) for contact in results])
+        else:
+            return warning("No contacts found matching the search term.")
+
+    
+

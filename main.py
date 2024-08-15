@@ -14,6 +14,7 @@ from controllers import (
     birthdays,
     delete_contact,
     fake_contacts,
+    search_contacts,
 )
 
 controllers = {
@@ -24,6 +25,7 @@ controllers = {
     "birthdays": birthdays,
     "fake-contacts": fake_contacts,
     "help": get_help,
+    "search-contacts": search_contacts,
 }
 
 
