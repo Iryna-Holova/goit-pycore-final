@@ -13,6 +13,7 @@ from controllers import (
     add_birthday,
     show_birthday,
     birthdays,
+    add_note
 )
 
 controllers = {
@@ -23,6 +24,7 @@ controllers = {
     "add-birthday": add_birthday,
     "show-birthday": show_birthday,
     "birthdays": birthdays,
+    "add-note": add_note
 }
 
 
@@ -71,4 +73,5 @@ def main():
 
 
 if __name__ == "__main__":
+
     main()

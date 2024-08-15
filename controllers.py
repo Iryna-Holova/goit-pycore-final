@@ -8,6 +8,8 @@ modify the address book.
 from decorators.input_error import input_error
 from contacts.address_book import AddressBook
 from contacts.record import Record
+from notes.note import Note
+from notes.notes_book import NotesBook
 
 
 @input_error
@@ -148,3 +150,16 @@ def birthdays(book: AddressBook) -> str:
         contacts in the `book` who have a birthday within the next 7 days.
     """
     return "\n".join([str(record) for record in book.get_upcoming_birthdays()])
+
+
+@input_error
+def add_note(book: NotesBook) -> str:
+    title = input("Enter title: ")
+    try:
+        note = book.find(title)
+        if note:
+            return " Note exist."
+    except ValueError:
+        note = Note(title)
+        book.add_note(note)
+        return "✅ Note added."
