@@ -2,11 +2,11 @@
 Main module.
 """
 
-from prompt_toolkit import PromptSession
 from helpers.suggest import suggest_command
-from helpers.completer import CustomCompleter
+from helpers.completer import Prompt
 from helpers.serialize import save_data, load_data
 from helpers.colors import green, danger, success
+from helpers.help import get_help
 from controllers import (
     add_contact,
     change_contact,
@@ -23,6 +23,7 @@ controllers = {
     "all-contacts": get_contacts,
     "birthdays": birthdays,
     "fake-contacts": fake_contacts,
+    "help": get_help,
 }
 
 
@@ -34,19 +35,11 @@ def main():
     print(success("Welcome to the assistant bot!"))
 
     commands = list(controllers) + ["close", "exit"]
-    session = PromptSession()
+    prompt = Prompt()
 
     while True:
         try:
-            command = (
-                session.prompt(
-                    "Enter a command: ",
-                    completer=CustomCompleter(commands),
-                    mouse_support=True,
-                )
-                .strip()
-                .lower()
-            )
+            command = prompt.prompt("Enter a command: ", commands).strip().lower()
         except KeyboardInterrupt:
             print("Good bye!")
             save_data(book)

@@ -10,7 +10,7 @@ from contacts.address_book import AddressBook
 from contacts.record import Record
 from helpers.colors import green, blue, success, warning, danger
 from helpers.generate_data import generate_random_contact
-from helpers.completer import CustomCompleter
+from helpers.completer import Prompt
 
 
 def add_contact(book: AddressBook) -> str:
@@ -58,14 +58,10 @@ def change_contact(book: AddressBook) -> str:
         str: A message indicating whether the contact was edited or not.
     """
     is_edited = False
-    session = PromptSession()
+    prompt = Prompt()
     try:
         while True:
-            name = session.prompt(
-                "Enter name: ",
-                completer=CustomCompleter(list(book)),
-                mouse_support=True,
-            )
+            name = prompt.prompt("Enter name: ", list(book))
             try:
                 contact = book.find(name)
                 break
@@ -87,10 +83,8 @@ def change_contact(book: AddressBook) -> str:
                     "add-birthday, add-address"
                 )
             )
-            command = session.prompt(
-                "Enter a command or press Enter to quit: ",
-                completer=CustomCompleter(list(commands)),
-                mouse_support=True,
+            command = prompt.prompt(
+                "Enter a command or press Enter to quit: ", list(commands)
             )
             if not command:
                 break
@@ -215,14 +209,10 @@ def delete_contact(book: AddressBook) -> str:
     Returns:
         str: A success message indicating the deletion of the contact.
     """
-    session = PromptSession()
+    prompt = Prompt()
     while True:
         try:
-            name = session.prompt(
-                "Enter name: ",
-                completer=CustomCompleter(list(book)),
-                mouse_support=True,
-            )
+            name = prompt.prompt("Enter name: ", list(book))
             book.delete(name)
             break
         except ValueError as error:
