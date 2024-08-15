@@ -7,6 +7,7 @@ modify the address book.
 
 from prompt_toolkit import PromptSession
 from contacts.address_book import AddressBook
+from contacts.email import add_emails, remove_email
 from contacts.record import Record
 from helpers.colors import green, blue, success, warning, danger
 from helpers.generate_data import generate_random_contact
@@ -78,11 +79,13 @@ def change_contact(book: AddressBook) -> str:
                 "remove-phone": remove_phone,
                 "add-birthday": edit_birthday,
                 "add-address": edit_address,
+                "add-email": add_emails,
+                "remove-email": remove_email,
             }
             print(
                 green(
                     "Choose a command: add-phone, remove-phone, "
-                    "add-birthday, add-address"
+                    "add-birthday, add-address, add-email, remove-email"
                 )
             )
             command = prompt.prompt(
