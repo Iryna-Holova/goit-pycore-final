@@ -2,10 +2,6 @@
 Phone field module.
 """
 
-import re
-
-PHONE_REGEXP = r"^\d{10}$"
-
 
 class Phone:
     """
@@ -22,11 +18,11 @@ class Phone:
         Raises:
             ValueError: If the phone number does not consist of 10 digits.
         """
-        if not re.match(PHONE_REGEXP, phone):
-            raise ValueError("❌ Phone number must consist of 10 digits")
+        if not phone.isdigit() or len(phone) != 10:
+            raise ValueError("Phone number must consist of 10 digits")
         self.value = phone
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         """
         Return the string representation of the phone field.
 
@@ -45,5 +41,6 @@ class Phone:
         Returns:
             bool: True if the Phone instances are equal, False otherwise.
         """
-        return isinstance(other, Phone) and self.value == other.value
-
+        if isinstance(other, Phone):
+            return self.value == other.value
+        return self.value == other
