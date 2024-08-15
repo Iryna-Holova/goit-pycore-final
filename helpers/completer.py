@@ -39,10 +39,10 @@ class Prompt():
         """
         Provide CLI prompt and return entered data
         """
-        our_style = Style.from_dict({'':style})
+        color_style = Style.from_dict({'prompt':style})
         return self.session.prompt(
-                    message,
+                   [('class:prompt', message)],
                     completer=CustomCompleter(commands, all_commands),
-                    style=our_style,
+                    style=color_style,
                     mouse_support=self.mouse_support
                 )
