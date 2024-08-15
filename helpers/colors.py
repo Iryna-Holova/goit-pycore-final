@@ -1,22 +1,30 @@
-from colorama import Fore, Back, Style, init
+"""
+Colors module.
+"""
+
+from colorama import Fore, Back, init
 
 # Initialize Colorama
 init(autoreset=True)
 
-# Palitra for ********************* TEXT *********************
+
+# Colors for ********************* TEXT *********************
 def green(text):
-    return Fore.GREEN + text + Style.RESET_ALL
+    return Fore.GREEN + text + Fore.RESET
+
 
 def blue(text):
-    return Fore.BLUE + text + Style.RESET_ALL
+    return Fore.BLUE + text + Fore.RESET
 
-# Palitra for ********************* BackGround *********************
+
+# Colors for ********************* BackGround *********************
 def success(text):
-    return Fore.WHITE + Back.GREEN + text + Style.RESET_ALL
+    return Fore.WHITE + Back.GREEN + text
+
 
 def warning(text):
-    return Fore.WHITE + Back.YELLOW + text + Style.RESET_ALL
+    return Fore.WHITE + Back.YELLOW + text
+
 
 def danger(text):
-    return Fore.WHITE + Back.RED + text + Style.RESET_ALL
-
+    return Fore.WHITE + Back.RED + text

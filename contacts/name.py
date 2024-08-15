@@ -19,7 +19,7 @@ class Name:
             ValueError: If the contact name is empty.
         """
         if not contact_name.strip():
-            raise ValueError("❌ Name cannot be empty")
+            raise ValueError("Name cannot be empty")
         self.value = contact_name
 
     def __str__(self) -> str:

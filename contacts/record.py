@@ -4,19 +4,20 @@ Record module.
 
 from typing import List
 from contacts.name import Name
-from contacts.birthday import Birthday
 from contacts.phone import Phone
+from contacts.birthday import Birthday
 from contacts.address import Address
 
 
 class Record:
     """
-    Class representing a record.
+    Class representing a contact in the address book.
 
     Attributes:
-        name (Name): The name of the record.
-        phones (List[Phone]): The list of phone numbers in the record.
-        birthday (Birthday | None): The birthday of the record.
+        name (Name): The name of the contact.
+        phones (List[Phone]): The list of phone numbers in the contact.
+        birthday (Birthday | None): The birthday of the contact.
+        address (Address | None): The address of the contact.
     """
 
     def __init__(self, contact_name: str) -> None:
@@ -49,7 +50,7 @@ class Record:
         """
         new_phone = Phone(phone)
         if new_phone in self.phones:
-            raise ValueError(f"❌ Phone {phone} already exists")
+            raise ValueError(f"Phone number {phone} already exists")
         self.phones.append(new_phone)
 
     def remove_phone(self, phone: str) -> None:
@@ -70,51 +71,7 @@ class Record:
         if phone_to_remove in self.phones:
             self.phones.remove(phone)
         else:
-            raise ValueError(f"❌ Phone number {phone} not found")
-
-    def edit_phone(self, old_phone: str, new_phone: str) -> None:
-        """
-        Edits a phone number in the record.
-
-        Args:
-            old_phone (str): The phone number to be replaced.
-            new_phone (str): The new phone number.
-
-        Returns:
-            None
-
-        Raises:
-            ValueError: If the old phone number is not found or the new phone
-            number already exists.
-        """
-        old_field = Phone(old_phone)
-        try:
-            phone_index = next(
-                i for i, phone in enumerate(self.phones) if phone == old_field
-            )
-        except StopIteration as exc:
-            raise ValueError(f"❌ Phone number {old_phone} not found") from exc
-        new_field = Phone(new_phone)
-        if new_field in self.phones:
-            raise ValueError(f"❌ Phone {new_phone} already exists")
-        self.phones[phone_index] = new_field
-
-    def find_phone(self, phone: str) -> Phone:
-        """
-        Finds a phone number in the record.
-
-        Args:
-            phone (str): The phone number to find.
-
-        Returns:
-            Phone: The found phone number.
-
-        Raises:
-            None
-        """
-        if Phone(phone) in self.phones:
-            return Phone(phone)
-        raise ValueError(f"❌ Phone number {phone} not found")
+            raise ValueError(f"Phone number {phone} not found")
 
     def add_birthday(self, birthday: str) -> None:
         """
@@ -138,9 +95,13 @@ class Record:
         Returns:
             None
         """
-        self.address = Address(address) 
+        self.address = Address(address)
 
     def __str__(self):
-        phones_str = "; ".join(str(phone) for phone in self.phones)
-        address_str = str(self.address) if self.address else "N/A"
-        return f"📞 name: {self.name.value:10} phones: {phones_str} address: {address_str}"
+        phones_str = ", ".join(map(str, self.phones)) if self.phones else "N/A"
+        return (
+            f"name: {self.name}\n"
+            f"phones: {phones_str}\n"
+            f"birthday: {self.birthday if self.birthday else 'N/A'}\n"
+            f"address: {self.address if self.address else 'N/A'}\n"
+        )
