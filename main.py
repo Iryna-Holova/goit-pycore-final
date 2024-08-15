@@ -1,35 +1,28 @@
 """
 Main module.
 """
-from helpers.colors import green, danger, success
+
 from prompt_toolkit import PromptSession
-from helpers.serialize import save_data, load_data
 from helpers.suggest import suggest_command
 from helpers.completer import CustomCompleter
-from contacts.address import Address
-
+from helpers.serialize import save_data, load_data
+from helpers.colors import green, danger, success
 from controllers import (
     add_contact,
     change_contact,
-    get_phones,
     get_contacts,
-    add_birthday,
-    show_birthday,
     birthdays,
-    add_address,
-    show_address,
+    delete_contact,
+    fake_contacts,
 )
 
 controllers = {
-    "add": add_contact,
-    "change": change_contact,
-    "phone": get_phones,
-    "all": get_contacts,
-    "add-birthday": add_birthday,
-    "show-birthday": show_birthday,
+    "add-contact": add_contact,
+    "change-contact": change_contact,
+    "delete-contact": delete_contact,
+    "all-contacts": get_contacts,
     "birthdays": birthdays,
-    "add-address": add_address,
-    "show-address": show_address,
+    "fake-contacts": fake_contacts,
 }
 
 
