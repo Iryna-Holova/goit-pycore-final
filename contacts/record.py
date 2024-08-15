@@ -34,6 +34,7 @@ class Record:
         self.phones: List[Phone] = []
         self.birthday: Optional[Birthday] = None
         self.address: Optional[Address] = None
+        self.emails = []
 
     def add_phone(self, phone: str) -> None:
         """
@@ -97,6 +98,16 @@ class Record:
         """
         self.address = Address(address)
 
+    def add_email(self, email):
+        if email in self.emails:
+            raise ValueError("Email already exists.")
+        self.emails.append(email)
+
+    def remove_email(self, email):
+        if email not in self.emails:
+            raise ValueError("Email not found.")
+        self.emails.remove(email)
+
     def __str__(self):
         phones_str = ", ".join(map(str, self.phones)) if self.phones else "N/A"
         return (
@@ -104,4 +115,5 @@ class Record:
             f"phones: {phones_str}\n"
             f"birthday: {self.birthday if self.birthday else 'N/A'}\n"
             f"address: {self.address if self.address else 'N/A'}\n"
+            f"email: {self.emails if self.emails else 'N/A'}\n"
         )
