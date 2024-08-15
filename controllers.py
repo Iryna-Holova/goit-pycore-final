@@ -11,6 +11,8 @@ from contacts.record import Record
 from helpers.colors import green, blue, success, warning, danger
 from helpers.generate_data import generate_random_contact
 from helpers.completer import CustomCompleter
+from helpers.display import display_contacts, display_contact
+from helpers.emojis import smiley_face, thumbs_up, check_mark
 
 
 def add_contact(book: AddressBook) -> str:
@@ -42,7 +44,8 @@ def add_contact(book: AddressBook) -> str:
         edit_birthday(new_record)
         edit_address(new_record)
         book.add_record(new_record)
-        return str(new_record) + success("Contact was added.")
+        print(display_contact(new_record))
+        return success(f"Contact was added {check_mark()}")
     except KeyboardInterrupt:
         return danger("\nOperation canceled.")
 
@@ -247,7 +250,7 @@ def get_contacts(book: AddressBook) -> str:
     if not book.data:
         return warning("Address book is empty.")
 
-    return "\n".join(map(str, book.data.values()))
+    return display_contacts(book)
 
 
 # @input_error

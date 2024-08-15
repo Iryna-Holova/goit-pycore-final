@@ -2,7 +2,7 @@
 Record module.
 """
 
-from typing import List
+from typing import List, Optional
 from contacts.name import Name
 from contacts.phone import Phone
 from contacts.birthday import Birthday
@@ -32,8 +32,8 @@ class Record:
         """
         self.name = Name(contact_name)
         self.phones: List[Phone] = []
-        self.birthday: Birthday | None = None
-        self.address: Address | None = None
+        self.birthday: Optional[Birthday] = None
+        self.address: Optional[Address] = None
 
     def add_phone(self, phone: str) -> None:
         """
