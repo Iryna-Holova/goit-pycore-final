@@ -3,7 +3,7 @@ Address book module.
 """
 
 from collections import UserDict
-from datetime import datetime, timedelta
+from datetime import datetime
 from contacts.record import Record
 
 
@@ -40,7 +40,7 @@ class AddressBook(UserDict):
         Returns:
             Record: The record with the given name.
         """
-        normalized_name = contact_name.lower()
+        normalized_name = contact_name.strip().lower()
         if normalized_name in self.data:
             return self.data[normalized_name]
         raise ValueError(f"Contact {contact_name} not found")
@@ -60,20 +60,22 @@ class AddressBook(UserDict):
             raise ValueError(f"Contact {contact_name} not found")
         del self.data[normalized_name]
 
-    def get_upcoming_birthdays(self) -> list:
+    def upcoming_birthdays(self, days: int) -> dict:
         """
-        Calculate upcoming birthdays within a week for a given list of users.
+        Calculate upcoming birthdays within a number of days for a given list
+        of users.
 
         Args:
-            users (list): A list of dictionaries containing user information
-            with keys "name" and "birthday".
+            book (AddressBook): An instance of the `AddressBook` class.
+            days (int): The number of days to check for upcoming birthdays.
 
         Returns:
-            list: A list of dictionaries with "name" and "congratulation_date"
-            keys for upcoming birthdays within a week.
+            dict: A dictionary with "congratulation_date" keys and
+            corresponding "name" values for upcoming birthdays within the
+            given number of days.
         """
         today = datetime.today().date()
-        upcoming_birthdays = []
+        upcoming_birthdays = {}
 
         for contact in self.data.values():
             if contact.birthday is None:
@@ -84,19 +86,11 @@ class AddressBook(UserDict):
             if birthday_this_year < today:
                 birthday_this_year = birthday.replace(year=today.year + 1)
 
-            if (birthday_this_year - today).days < 7:
-                if birthday_this_year.weekday() >= 5:
-                    congrats_date = birthday_this_year + timedelta(
-                        days=(7 - birthday_this_year.weekday())
-                    )
-                else:
-                    congrats_date = birthday_this_year
+            if (birthday_this_year - today).days < days:
+                upcoming_birthdays[birthday_this_year] = contact.name.value
 
-                upcoming_birthdays.append(
-                    {
-                        "name": contact.name.value,
-                        "congratulation_date": congrats_date.strftime("%Y.%m.%d"),
-                    }
-                )
-
-        return upcoming_birthdays
+        sorted_birthdays = {
+            date.strftime("%d.%m.%Y"): name
+            for date, name in sorted(upcoming_birthdays.items())
+        }
+        return "\n".join(f"{date}: {name}" for date, name in sorted_birthdays.items())
