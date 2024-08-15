@@ -140,9 +140,12 @@ def remove_phone(contact: Record) -> None:
     Returns:
         None
     """
+    prompt = Prompt()
     while True:
         try:
-            phone = input(blue("Enter phone number or press Enter to quit: "))
+            phone = prompt.prompt(
+                "Enter phone number or press Enter to skip: ",
+                list(map(str, contact.phones)), True)
             if not phone:
                 break
             contact.remove_phone(phone)
