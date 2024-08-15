@@ -1,5 +1,6 @@
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit import PromptSession
+from prompt_toolkit.styles import Style
 
 class CustomCompleter(Completer):
     """
@@ -30,12 +31,18 @@ class Prompt():
         self.session = PromptSession()
         self.mouse_support = mouse_support
 
-    def prompt(self, message: str, commands: list, all_commands: bool = False) -> str:
+    def prompt(self,
+               message: str,
+               commands: list,
+               all_commands: bool = False,
+               style: str = '') -> str:
         """
-        Provide CLI promt and return enterd data
+        Provide CLI prompt and return entered data
         """
+        our_style = Style.from_dict({'':style})
         return self.session.prompt(
                     message,
                     completer=CustomCompleter(commands, all_commands),
+                    style=our_style,
                     mouse_support=self.mouse_support
                 )
