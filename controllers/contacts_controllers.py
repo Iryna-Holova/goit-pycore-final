@@ -94,11 +94,7 @@ def change_contact(book: AddressBook) -> str:
                 commands["edit-address"] = edit_address
             else:
                 commands["add-address"] = edit_address
-            print(
-                green(
-                    f"Choose a command: {", ".join(list(commands))}"
-                )
-            )
+            print(green(f"Choose a command: {", ".join(list(commands))}"))
             command = prompt.prompt(
                 "Enter a command or press Enter to quit: ", list(commands)
             )
