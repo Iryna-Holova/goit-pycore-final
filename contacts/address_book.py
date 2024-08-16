@@ -94,3 +94,28 @@ class AddressBook(UserDict):
             for date, name in sorted(upcoming_birthdays.items())
         }
         return "\n".join(f"{date}: {name}" for date, name in sorted_birthdays.items())
+    
+    def search(self, search_term: str) -> list:
+        """
+        Searches for contacts by name or phone number.
+        
+        Args:
+            search_term (str): The term to search for in the contact names and phone numbers.
+        
+        Returns:
+            list: A list of `Record` instances that match the search term.
+        """
+        search_term = search_term.lower()
+        results = []
+
+        for record in self.data.values():
+            if search_term in record.name.value.lower():
+                results.append(record)
+                continue  
+
+            for phone in record.phones:
+                if search_term in str(phone):
+                    results.append(record)
+                    break  
+
+        return results
