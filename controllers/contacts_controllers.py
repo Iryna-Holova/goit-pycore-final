@@ -339,6 +339,8 @@ def fake_contacts(book: AddressBook) -> str:
             record.add_phone(phone)
         if contact["birthday"]:
             record.add_birthday(contact["birthday"])
+        if contact["email"]:
+            record.add_email(contact["email"])
         if contact["address"]:
             record.add_address(contact["address"])
         book.add_record(record)
