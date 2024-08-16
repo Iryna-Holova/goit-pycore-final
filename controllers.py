@@ -8,8 +8,6 @@ modify the address book.
 from helpers.completer import CustomCompleter
 from helpers.generate_data import generate_random_contact
 from helpers.colors import green, blue, success, warning, danger
-from notes.notes_book import NotesBook
-from notes.note import Note
 from prompt_toolkit import PromptSession
 from contacts.address_book import AddressBook
 from contacts.record import Record
