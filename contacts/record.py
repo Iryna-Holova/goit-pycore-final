@@ -6,6 +6,7 @@ from typing import List, Optional
 from contacts.name import Name
 from contacts.phone import Phone
 from contacts.birthday import Birthday
+from contacts.email import Email
 from contacts.address import Address
 
 
@@ -17,6 +18,7 @@ class Record:
         name (Name): The name of the contact.
         phones (List[Phone]): The list of phone numbers in the contact.
         birthday (Birthday | None): The birthday of the contact.
+        email (Email | None): The email address of the contact.
         address (Address | None): The address of the contact.
     """
 
@@ -33,6 +35,7 @@ class Record:
         self.name = Name(contact_name)
         self.phones: List[Phone] = []
         self.birthday: Optional[Birthday] = None
+        self.email: Optional[Email] = None
         self.address: Optional[Address] = None
 
     def add_phone(self, phone: str) -> None:
@@ -85,6 +88,36 @@ class Record:
         """
         self.birthday = Birthday(birthday)
 
+    def remove_birthday(self) -> None:
+        """
+        Removes the birthday from the record.
+
+        Returns:
+            None
+        """
+        self.birthday = None
+
+    def add_email(self, email: str) -> None:
+        """
+        Adds an email address to the record.
+
+        Args:
+            email (str): The email address to be added.
+
+        Returns:
+            None
+        """
+        self.email = Email(email)
+
+    def remove_email(self) -> None:
+        """
+        Removes the email address from the record.
+
+        Returns:
+            None
+        """
+        self.email = None
+
     def add_address(self, address: str) -> None:
         """
         Adds an address to the record.
@@ -96,6 +129,15 @@ class Record:
             None
         """
         self.address = Address(address)
+
+    def remove_address(self) -> None:
+        """
+        Removes the address from the record.
+
+        Returns:
+            None
+        """
+        self.address = None
 
     def __str__(self):
         phones_str = ", ".join(map(str, self.phones)) if self.phones else "N/A"

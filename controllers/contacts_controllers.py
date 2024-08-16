@@ -75,15 +75,28 @@ def change_contact(book: AddressBook) -> str:
         print(contact)
         while True:
             commands = {
-                "add-phone": add_phones,
-                "remove-phone": remove_phone,
-                "add-birthday": edit_birthday,
-                "add-address": edit_address,
+                "add-phones": add_phones,
             }
+            if contact.phones:
+                commands["remove-phones"] = remove_phone
+            if contact.birthday:
+                commands["remove-birthday"] = contact.remove_birthday
+                commands["edit-birthday"] = edit_birthday
+            else:
+                commands["add-birthday"] = edit_birthday
+            if contact.email:
+                commands["remove-email"] = contact.remove_email
+                commands["edit-email"] = edit_email
+            else:
+                commands["add-email"] = edit_email
+            if contact.address:
+                commands["remove-address"] = contact.remove_address
+                commands["edit-address"] = edit_address
+            else:
+                commands["add-address"] = edit_address
             print(
                 green(
-                    "Choose a command: add-phone, remove-phone, "
-                    "add-birthday, add-address"
+                    f"Choose a command: {", ".join(list(commands))}"
                 )
             )
             command = prompt.prompt(
@@ -201,6 +214,29 @@ def edit_address(contact: Record) -> None:
                 break
             contact.add_address(address)
             print(green("Address added."))
+            break
+        except ValueError as e:
+            print(danger(str(e)))
+            continue
+
+
+def edit_email(contact: Record) -> None:
+    """
+    Edits the email of the `contact`.
+
+    Args:
+        contact (Record): An instance of the `Record` class.
+
+    Returns:
+        None
+    """
+    while True:
+        try:
+            email = input(blue("Enter email or press Enter to skip: "))
+            if not email:
+                break
+            contact.add_email(email)
+            print(green("Email added."))
             break
         except ValueError as e:
             print(danger(str(e)))
