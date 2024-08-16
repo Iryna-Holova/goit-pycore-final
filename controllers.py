@@ -5,7 +5,8 @@ The controllers module contains functions that interact with the user and
 modify the address book.
 """
 
-from prompt_toolkit import PromptSession
+from rich.progress import Progress
+from time import sleep
 from contacts.address_book import AddressBook
 from contacts.record import Record
 from helpers.colors import green, blue, success, warning, danger
@@ -239,6 +240,13 @@ def get_contacts(book: AddressBook) -> str:
         str: A string containing the names and phone numbers of all contacts
         in the `book`.
     """
+    with Progress() as progress:
+        task = progress.add_task("[blue]Processing...", total=100)
+
+        while not progress.finished:
+            progress.update(task, advance=100)
+            sleep(0.8)
+
     if not book.data:
         return warning("Address book is empty.")
 
