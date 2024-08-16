@@ -374,3 +374,31 @@ def search_contacts(book: AddressBook) -> str:
         if results:
             return "\n".join([display_contact(contact) for contact in results])
         return warning("No contacts found matching the search term.")
+
+
+def interactive_search_with_autocomplete(book: AddressBook) -> str:
+    """
+    Interactive search with autocomplete suggestions during input.
+    """
+    # Get all names from the address book for autocomplete suggestions
+    contact_names = [record.name.value for record in book.data.values()]
+    
+    prompt = Prompt()
+
+    while True:
+        try:
+            search_term = prompt.prompt("Enter search term (name or phone number): ", contact_names).strip()
+            if search_term.lower() == "q":
+                return danger("Operation canceled.")
+            if not search_term:
+                print(warning("Invalid input. Please enter a valid search term or q to exit"))
+                continue
+
+            results = book.smart_search(search_term)
+            if results:
+                # Here we make sure to pass the search_term to highlight it
+                return "\n".join([display_contact(contact, search_term) for contact in results])
+
+            print(warning("No contacts found matching the search term."))
+        except KeyboardInterrupt:
+            return danger("\nOperation canceled.")

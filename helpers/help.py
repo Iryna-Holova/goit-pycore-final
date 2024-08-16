@@ -19,6 +19,8 @@ def get_help(_) -> str:
     - all-contacts: Shows all contacts with their phone numbers.
     - birthdays: Shows upcoming birthdays within the next 7 days.
     - fake-contacts: Debug function for generating dummy contacts,
+    - search-contacts: Allows you to search for contacts by name or phone number.
+    - smart-search: Interactive search with autocomplete suggestions during input.
 
     - close / exit : Exits the program.{Style.RESET_ALL}
     """

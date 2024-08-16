@@ -5,7 +5,7 @@ Address book module.
 from collections import UserDict
 from datetime import datetime
 from contacts.record import Record
-
+from fuzzywuzzy import process
 
 class AddressBook(UserDict):
     """
@@ -95,6 +95,7 @@ class AddressBook(UserDict):
         }
         return "\n".join(f"{date}: {name}" for date, name in sorted_birthdays.items())
     
+    
     def search(self, search_term: str) -> list:
         """
         Searches for contacts by name or phone number.
@@ -118,4 +119,40 @@ class AddressBook(UserDict):
                     results.append(record)
                     break  
 
+        return results
+    
+
+    def smart_search(self, search_term: str, limit: int = 5) -> list:
+        """
+        Smart search that finds contacts even with typos and suggests contacts as the user types.
+        
+        Args:
+            search_term (str): The term to search for in the contact names and phone numbers.
+            limit (int): The maximum number of suggestions to return.
+        
+            Returns:
+            list: A list of `Record` instances that match the search term with fuzzy matching.
+        """
+        search_term = search_term.lower()
+        names = [record.name.value for record in self.data.values()]
+        phone_numbers = [(str(phone), record.name.value) for record in self.data.values() for phone in record.phones]
+        
+        # Get fuzzy matches for names
+        name_matches = process.extract(search_term, names, limit=limit)
+        matched_names = [match[0] for match in name_matches if match[1] >= 70]  # 70% similarity threshold
+        
+        # Get matches for phone numbers
+        phone_matches = [name for phone, name in phone_numbers if search_term in phone]
+        
+        # Combine name and phone matches
+        matched_names.extend(phone_matches)
+        matched_names = list(set(matched_names))  # Remove duplicates
+
+        results = []
+        for name in matched_names:
+            record = self.data.get(name.lower())  # Fetch the Record object
+            if record:  # Ensure that it's a valid Record object
+                results.append(record)
+        
+        # Return just the list of Record objects
         return results

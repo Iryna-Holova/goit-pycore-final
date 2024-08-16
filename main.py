@@ -23,6 +23,7 @@ from controllers.contacts_controllers import (
     delete_contact,
     fake_contacts,
     search_contacts,
+    interactive_search_with_autocomplete,
 )
 
 controllers = {
@@ -34,6 +35,7 @@ controllers = {
     "fake-contacts": fake_contacts,
     "help": get_help,
     "search-contacts": search_contacts,
+    "smart-search": interactive_search_with_autocomplete,
 }
 notes_controllers = {
     "add-note": add_note,
