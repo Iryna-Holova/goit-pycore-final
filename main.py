@@ -41,7 +41,10 @@ def main():
 
     while True:
         try:
-            command = prompt.prompt("Enter a command: ", commands).strip().lower()
+            command = prompt.prompt(
+                "Enter a command: ",
+                commands
+            ).strip().lower()
         except KeyboardInterrupt:
             print("Good bye!")
             save_data(book)
