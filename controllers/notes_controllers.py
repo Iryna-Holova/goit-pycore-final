@@ -5,12 +5,13 @@ The controllers module contains functions that interact with the user and
 modify the notes book.
 """
 
+from prompt_toolkit import PromptSession
 from helpers.colors import green, blue, success, warning, danger
 from helpers.completer import CustomCompleter
-from prompt_toolkit import PromptSession
+from helpers.completer import Prompt
+from helpers.generate_data import generate_random_note
 from notes.notes_book import NotesBook
 from notes.note import Note
-from helpers.completer import Prompt
 
 
 def add_note(book: NotesBook) -> str:
@@ -265,3 +266,39 @@ def add_reminder(note: Note) -> None:
         except ValueError as e:
             print(danger(str(e)))
             continue
+
+
+def fake_notes(book: NotesBook) -> str:
+    """
+    Generates a specified number of fake notes and adds them to the NotesBook.
+
+    Args:
+        book (NotesBook): An instance of the NotesBook class to which the
+        fake notes will be added.
+
+    Returns:
+        str: A success message indicating the number of fake notes added.
+    """
+    while True:
+        try:
+            count = input(blue("Enter number of fake notes: "))
+            if not count.isdigit():
+                print(warning("Invalid input. Please enter a valid number."))
+                continue
+            count = int(count)
+            break
+        except KeyboardInterrupt:
+            return danger("\nOperation canceled.")
+
+    for _ in range(count):
+        note_data = generate_random_note()
+        note = Note(note_data["title"])
+        if note_data["text"]:
+            note.add_text(note_data["text"])
+        for tag in note_data["tags"]:
+            note.add_tag(tag)
+        if note_data["reminder"]:
+            note.set_reminder(note_data["reminder"])
+        book.add_note(note)
+
+    return success(f"{count} fake contacts added.")
