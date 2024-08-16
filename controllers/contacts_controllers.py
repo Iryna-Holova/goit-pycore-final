@@ -148,7 +148,10 @@ def remove_phone(contact: Record) -> None:
         try:
             phone = prompt.prompt(
                 "Enter phone number or press Enter to skip: ",
-                list(map(str, contact.phones)), True, style="cyan")
+                list(map(str, contact.phones)),
+                True,
+                style="cyan",
+            )
             if not phone:
                 break
             contact.remove_phone(phone)
@@ -327,8 +330,8 @@ def search_contacts(book: AddressBook) -> str:
         if search_term.lower() == "q":
             return danger("Operation canceled.")
         if not search_term:
-            print(warning(
-                "Invalid input. Please enter a valid search term or q to exit")
+            print(
+                warning("Invalid input. Please enter a valid search term or q to exit")
             )
             continue
 

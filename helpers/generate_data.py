@@ -18,10 +18,7 @@ def generate_random_contact() -> dict:
 
     data = {
         "name": choice([fake.name(), fake.first_name()]),
-        "phones": [
-            "".join(choices("0123456789", k=10))
-            for _ in range(randint(0, 4))
-        ],
+        "phones": ["".join(choices("0123456789", k=10)) for _ in range(randint(0, 4))],
         "birthday": (
             fake.date_of_birth().strftime("%d.%m.%Y") if random() < 0.7 else ""
         ),
