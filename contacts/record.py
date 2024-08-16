@@ -32,8 +32,8 @@ class Record:
         """
         self.name = Name(contact_name)
         self.phones: List[Phone] = []
-        self.birthday: Optional[Birthday] = None
-        self.address: Optional[Address] = None
+        self.birthday: Birthday | None = None
+        self.address: Address | None = None
 
     def add_phone(self, phone: str) -> None:
         """

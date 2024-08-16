@@ -2,8 +2,9 @@
 Main module.
 """
 
+from prompt_toolkit import PromptSession
 from helpers.suggest import suggest_command
-from helpers.completer import Prompt
+from helpers.completer import CustomCompleter
 from helpers.serialize import save_data, load_data
 from helpers.colors import green, danger, success
 from notes.notes_book import NotesBook
@@ -26,7 +27,7 @@ controllers = {
     "all-contacts": get_contacts,
     "birthdays": birthdays,
     "fake-contacts": fake_contacts,
-
+    "help": get_help
 }
 notes_controllers = {
     "add-note": add_note,
@@ -34,7 +35,7 @@ notes_controllers = {
     "add-tag": add_tag,
     "all-notes": get_notes,
     "change-note": change_note,
-    "help": get_help}
+}
 
 
 def main():
