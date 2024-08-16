@@ -5,8 +5,8 @@ The controllers module contains functions that interact with the user and
 modify the address book.
 """
 
-from rich.progress import Progress
 from time import sleep
+from rich.progress import Progress
 from contacts.address_book import AddressBook
 from contacts.record import Record
 from helpers.colors import green, blue, success, warning, danger
@@ -327,14 +327,12 @@ def search_contacts(book: AddressBook) -> str:
         if search_term.lower() == "q":
             return danger("Operation canceled.")
         if not search_term:
-            print(warning("Invalid input. Please enter a valid search term or q to exit"))
+            print(warning(
+                "Invalid input. Please enter a valid search term or q to exit")
+            )
             continue
 
         results = book.search(search_term)
         if results:
             return "\n".join([display_contact(contact) for contact in results])
-        else:
-            return warning("No contacts found matching the search term.")
-
-    
-
+        return warning("No contacts found matching the search term.")

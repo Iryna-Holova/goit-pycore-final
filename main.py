@@ -7,7 +7,7 @@ from helpers.completer import Prompt
 from helpers.serialize import save_data, load_data
 from helpers.colors import green, danger, success
 from helpers.help import get_help
-from controllers import (
+from controllers.contacts_controllers import (
     add_contact,
     change_contact,
     get_contacts,
