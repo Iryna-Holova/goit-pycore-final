@@ -11,6 +11,10 @@ from helpers.colors import green, blue, success, warning, danger
 from prompt_toolkit import PromptSession
 from contacts.address_book import AddressBook
 from contacts.record import Record
+from helpers.colors import green, blue, success, warning, danger
+from helpers.generate_data import generate_random_contact
+from helpers.completer import Prompt
+from helpers.display import display_contacts, display_contact
 
 
 def add_contact(book: AddressBook) -> str:
@@ -42,7 +46,8 @@ def add_contact(book: AddressBook) -> str:
         edit_birthday(new_record)
         edit_address(new_record)
         book.add_record(new_record)
-        return str(new_record) + success("Contact was added.")
+        print(display_contact(new_record))
+        return success("Contact was added.")
     except KeyboardInterrupt:
         return danger("\nOperation canceled.")
 
@@ -58,14 +63,10 @@ def change_contact(book: AddressBook) -> str:
         str: A message indicating whether the contact was edited or not.
     """
     is_edited = False
-    session = PromptSession()
+    prompt = Prompt()
     try:
         while True:
-            name = session.prompt(
-                "Enter name: ",
-                completer=CustomCompleter(list(book)),
-                mouse_support=True,
-            )
+            name = prompt.prompt("Enter name: ", list(book))
             try:
                 contact = book.find(name)
                 break
@@ -87,10 +88,8 @@ def change_contact(book: AddressBook) -> str:
                     "add-birthday, add-address"
                 )
             )
-            command = session.prompt(
-                "Enter a command or press Enter to quit: ",
-                completer=CustomCompleter(list(commands)),
-                mouse_support=True,
+            command = prompt.prompt(
+                "Enter a command or press Enter to quit: ", list(commands)
             )
             if not command:
                 break
@@ -146,9 +145,12 @@ def remove_phone(contact: Record) -> None:
     Returns:
         None
     """
+    prompt = Prompt()
     while True:
         try:
-            phone = input(blue("Enter phone number or press Enter to quit: "))
+            phone = prompt.prompt(
+                "Enter phone number or press Enter to skip: ",
+                list(map(str, contact.phones)), True, style="cyan")
             if not phone:
                 break
             contact.remove_phone(phone)
@@ -215,14 +217,10 @@ def delete_contact(book: AddressBook) -> str:
     Returns:
         str: A success message indicating the deletion of the contact.
     """
-    session = PromptSession()
+    prompt = Prompt()
     while True:
         try:
-            name = session.prompt(
-                "Enter name: ",
-                completer=CustomCompleter(list(book)),
-                mouse_support=True,
-            )
+            name = prompt.prompt("Enter name: ", list(book))
             book.delete(name)
             break
         except ValueError as error:
@@ -247,7 +245,7 @@ def get_contacts(book: AddressBook) -> str:
     if not book.data:
         return warning("Address book is empty.")
 
-    return "\n".join(map(str, book.data.values()))
+    return display_contacts(book)
 
 
 # @input_error
