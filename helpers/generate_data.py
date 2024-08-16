@@ -19,10 +19,9 @@ def generate_random_contact() -> dict:
 
     data = {
         "name": choice([fake.name(), fake.first_name()]),
-        "phones": ([
-            "".join(choices("0123456789", k=10))
-            for _ in range(randint(0, 4))
-        ]),
+        "phones": (
+            ["".join(choices("0123456789", k=10)) for _ in range(randint(0, 4))]
+        ),
         "birthday": (
             fake.date_of_birth().strftime("%d.%m.%Y") if random() < 0.7 else ""
         ),
@@ -51,11 +50,7 @@ def generate_random_note() -> dict:
         "title": " ".join(
             choices(fake.words(), k=randint(2, min(5, len(fake.words()))))
         ),
-        "text": (
-            fake.text(max_nb_chars=randint(4, 200))
-            if random() >= 0.3
-            else ""
-        ),
+        "text": (fake.text(max_nb_chars=randint(4, 200)) if random() >= 0.3 else ""),
         "tags": [fake.word() for _ in range(randint(0, 5))],
         "reminder": generate_future_date() if random() >= 0.3 else "",
     }

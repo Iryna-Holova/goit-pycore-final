@@ -80,8 +80,7 @@ def change_note(book: NotesBook) -> str:
             }
             print(
                 green(
-                    "Choose a command: add-tag, remove-tag, "
-                    "add-reminder, edit-text"
+                    "Choose a command: add-tag, remove-tag, " "add-reminder, edit-text"
                 )
             )
             command = session.prompt(

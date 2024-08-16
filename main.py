@@ -9,7 +9,12 @@ from helpers.colors import green, danger, success
 from helpers.help import get_help
 from notes.notes_book import NotesBook
 from controllers.notes_controllers import (
-    add_note, change_note, delete_note, get_notes, fake_notes)
+    add_note,
+    change_note,
+    delete_note,
+    get_notes,
+    fake_notes,
+)
 from controllers.contacts_controllers import (
     add_contact,
     change_contact,
@@ -52,8 +57,7 @@ def main():
 
     while True:
         try:
-            command = prompt.prompt(
-                "Enter a command: ", commands).strip().lower()
+            command = prompt.prompt("Enter a command: ", commands).strip().lower()
         except KeyboardInterrupt:
             print("Good bye!")
             save_data(book)
