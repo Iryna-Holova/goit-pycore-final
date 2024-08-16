@@ -9,7 +9,7 @@ from helpers.colors import green, danger, success
 from helpers.help import get_help
 from notes.notes_book import NotesBook
 from controllers.notes_controllers import (
-    add_note, add_text, add_tag, get_notes, change_note)
+    add_note, change_note, delete_note, get_notes)
 from controllers.contacts_controllers import (
     add_contact,
     change_contact,
@@ -32,10 +32,9 @@ controllers = {
 }
 notes_controllers = {
     "add-note": add_note,
-    "add-text": add_text,
-    "add-tag": add_tag,
-    "all-notes": get_notes,
     "change-note": change_note,
+    "delete-note": delete_note,
+    "all-notes": get_notes
 }
 
 

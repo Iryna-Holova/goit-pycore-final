@@ -6,10 +6,11 @@ modify the notes book.
 """
 
 from helpers.colors import green, blue, success, warning, danger
-from prompt_toolkit import PromptSession
 from helpers.completer import CustomCompleter
+from prompt_toolkit import PromptSession
 from notes.notes_book import NotesBook
 from notes.note import Note
+from helpers.completer import Prompt
 
 
 def add_note(book: NotesBook) -> str:
@@ -155,12 +156,6 @@ def add_tag(note: Note) -> None:
 
 def get_notes(book: NotesBook) -> str:
     """
-    f"title: {self.title}\n"
-            f"text: {self.text}\n"
-            f"tags: {tags_str}\n"
-            f"created_on: {self.created_on}\n"
-            f"reminder: {self.reminder}"
-
     Returns a string containing the title, text, tags, created_on, reminder of all notes
     in the `book`.
 
@@ -223,6 +218,30 @@ def remove_tag(note: Note) -> None:
         except ValueError as e:
             print(danger(str(e)))
             continue
+
+
+def delete_note(book: NotesBook) -> str:
+    """
+    Deletes a note from the notes book.
+
+    Args:
+        book (NotesBook): An instance of the NotesBook class from which
+        the note will be deleted.
+
+    Returns:
+        str: A success message indicating the deletion of the contact.
+    """
+    prompt = Prompt()
+    while True:
+        try:
+            title = prompt.prompt("Enter title: ", list(book))
+            book.delete(title)
+            break
+        except ValueError as error:
+            print(warning(str(error)))
+        except KeyboardInterrupt:
+            return danger("Operation canceled.")
+    return success(f"Note {title} deleted.")
 
 
 def add_reminder(note: Note) -> None:
