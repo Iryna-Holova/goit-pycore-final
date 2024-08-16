@@ -42,6 +42,7 @@ def add_contact(book: AddressBook) -> str:
 
         add_phones(new_record)
         edit_birthday(new_record)
+        edit_email(new_record)
         edit_address(new_record)
         book.add_record(new_record)
         print(display_contact(new_record))
