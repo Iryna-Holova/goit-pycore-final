@@ -7,6 +7,9 @@ from helpers.completer import Prompt
 from helpers.serialize import save_data, load_data
 from helpers.colors import green, danger, success
 from helpers.help import get_help
+from notes.notes_book import NotesBook
+from controllers.notes_controllers import (
+    add_note, add_text, add_tag, get_notes, change_note)
 from controllers.contacts_controllers import (
     add_contact,
     change_contact,
@@ -27,6 +30,13 @@ controllers = {
     "help": get_help,
     "search-contacts": search_contacts,
 }
+notes_controllers = {
+    "add-note": add_note,
+    "add-text": add_text,
+    "add-tag": add_tag,
+    "all-notes": get_notes,
+    "change-note": change_note,
+}
 
 
 def main():
@@ -34,6 +44,7 @@ def main():
     The main function that serves as the entry point for the application.
     """
     book = load_data()
+    notes_book = NotesBook()
     print(success("Welcome to the assistant bot!"))
 
     commands = list(controllers) + ["close", "exit"]
@@ -41,7 +52,8 @@ def main():
 
     while True:
         try:
-            command = prompt.prompt("Enter a command: ", commands).strip().lower()
+            command = prompt.prompt(
+                "Enter a command: ", commands).strip().lower()
         except KeyboardInterrupt:
             print("Good bye!")
             save_data(book)
@@ -60,6 +72,9 @@ def main():
 
         elif command in controllers:
             print(controllers[command](book))
+
+        elif command in notes_controllers:
+            print(notes_controllers[command](notes_book))
 
         else:
             similar_commands = suggest_command(command, commands)
