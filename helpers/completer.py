@@ -32,7 +32,7 @@ class Prompt():
     """
     Custom prompt
     """
-    def __init__(self, mouse_support=True) -> None:
+    def __init__(self, mouse_support=False) -> None:
         self.session = PromptSession()
         self.mouse_support = mouse_support
 
