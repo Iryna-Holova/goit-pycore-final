@@ -32,10 +32,10 @@ class Note:
         Returns:
             None
         """
-        self.title = Title(title)
-        self.text = None
+        self.title: Title = Title(title)
+        self.text: Text | None = None
         self.tags: List[Tag] = []
-        self.created_on = CreatedOn()
+        self.created_on: CreatedOn = CreatedOn()
         self.reminder: Reminder | None = None
 
     def add_text(self, text: str) -> None:
