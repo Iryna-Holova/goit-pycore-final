@@ -1,6 +1,6 @@
-# """
-# Serialize and deserialize address book data
-# """
+"""
+Serialize and deserialize address book data
+"""
 
 import pickle
 from time import sleep
