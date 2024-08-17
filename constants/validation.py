@@ -3,7 +3,7 @@ Validation constants module.
 """
 
 NAME_MIN_LENGTH = 1
-NAME_MAX_LENGTH = 15
+NAME_MAX_LENGTH = 30
 PHONE_LENGTH = 10
 PHONE_PATTERN = r"^\d{10}$"
 DATE_FORMAT = "%d.%m.%Y"
@@ -14,7 +14,8 @@ ADDRESS_MAX_LENGTH = 100
 
 validation_errors = {
     "invalid_name": (
-        f"Name must consist of {NAME_MIN_LENGTH} " f"to {NAME_MAX_LENGTH} characters."
+        f"Name must consist of {NAME_MIN_LENGTH} "
+        f"to {NAME_MAX_LENGTH} characters."
     ),
     "duplicate_name": "Name {} already exists.",
     "name_not_found": "Name {} not found.",
