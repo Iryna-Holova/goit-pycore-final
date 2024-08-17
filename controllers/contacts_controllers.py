@@ -55,7 +55,7 @@ def add_contact(book: AddressBook) -> str:
         print(display_contact(new_record))
         return success(info_messages["contact_added"])
     except KeyboardInterrupt:
-        return danger(info_messages["operation_cancelled"])
+        return danger("\n" + info_messages["operation_cancelled"])
 
 
 def change_contact(book: AddressBook) -> str:
@@ -109,12 +109,12 @@ def change_contact(book: AddressBook) -> str:
                 all_commands[commands["edit_address"]] = edit_address
             else:
                 all_commands[commands["add_address"]] = edit_address
-            print(dim(questions["back"] + f"Options: {", ".join(list(all_commands))}"))
+            options = f"Options: {", ".join(list(all_commands))}"
+            print(dim(questions["back"] + options))
             question = dim(questions["back"]) + blue(questions["command"])
             print(question, end="")
-            command = prompt.prompt(
-                " " * len(questions["back"] + questions["command"]), list(all_commands)
-            )
+            n = len(questions["back"] + questions["command"])
+            command = prompt.prompt(" " * n, list(all_commands))
             print("\033[F\033[K", end="")
             print(f"{question}{command}")
 
@@ -125,7 +125,10 @@ def change_contact(book: AddressBook) -> str:
                 is_edited = True
                 print(display_contact(contact))
             else:
-                print(dim(questions["back"]) + danger(info_messages["unknown_command"]))
+                print(
+                    dim(questions["back"])
+                    + danger(info_messages["unknown_command"])
+                )
                 continue
         return (
             success(info_messages["contact_edited"])
@@ -153,7 +156,8 @@ def add_phones(contact: Record) -> None:
     while True:
         try:
             phone = input(
-                dim(questions["back"]) + blue(questions["phone"] + questions["skip"])
+                dim(questions["back"])
+                + blue(questions["phone"] + questions["skip"])
             )
             if not phone:
                 break
@@ -182,16 +186,17 @@ def remove_phone(contact: Record) -> None:
             )
 
             print(question, end="")
-            phone = prompt.prompt(
-                " " * len(questions["back"] + questions["phone"] + questions["skip"]),
-                list(map(str, contact.phones)),
-            )
+            n = len(questions["back"] + questions["phone"] + questions["skip"])
+            phone = prompt.prompt(" " * n, list(map(str, contact.phones)))
             print("\033[F\033[K", end="")
             print(f"{question}{phone}")
             if not phone:
                 break
             contact.remove_phone(phone)
-            print(dim(questions["back"]) + green(info_messages["phone_removed"]))
+            print(
+                dim(questions["back"])
+                + green(info_messages["phone_removed"])
+            )
         except ValueError as e:
             print(dim(questions["back"]) + danger(str(e)))
             continue
@@ -210,12 +215,16 @@ def edit_birthday(contact: Record) -> None:
     while True:
         try:
             birthday = input(
-                dim(questions["back"]) + blue(questions["birthday"] + questions["skip"])
+                dim(questions["back"])
+                + blue(questions["birthday"] + questions["skip"])
             )
             if not birthday:
                 break
             contact.add_birthday(birthday)
-            print(dim(questions["back"]) + green(info_messages["birthday_added"]))
+            print(
+                dim(questions["back"])
+                + green(info_messages["birthday_added"])
+            )
             break
         except ValueError as e:
             print(dim(questions["back"]) + danger(str(e)))
@@ -249,12 +258,16 @@ def edit_address(contact: Record) -> None:
     while True:
         try:
             address = input(
-                dim(questions["back"]) + blue(questions["address"] + questions["skip"])
+                dim(questions["back"])
+                + blue(questions["address"] + questions["skip"])
             )
             if not address:
                 break
             contact.add_address(address)
-            print(dim(questions["back"]) + green(info_messages["address_added"]))
+            print(
+                dim(questions["back"])
+                + green(info_messages["address_added"])
+            )
             break
         except ValueError as e:
             print(dim(questions["back"]) + danger(str(e)))
@@ -288,7 +301,8 @@ def edit_email(contact: Record) -> None:
     while True:
         try:
             email = input(
-                dim(questions["back"]) + blue(questions["email"] + questions["skip"])
+                dim(questions["back"])
+                + blue(questions["email"] + questions["skip"])
             )
             if not email:
                 break
@@ -385,7 +399,10 @@ def birthdays(book: AddressBook) -> str:
     while True:
         days = input(dim(questions["back"]) + blue(questions["days"]))
         if not days.isdigit():
-            print(dim(questions["back"]) + warning(validation_errors["invalid_number"]))
+            print(
+                dim(questions["back"])
+                + warning(validation_errors["invalid_number"])
+            )
             continue
         return book.upcoming_birthdays(int(days))
 
@@ -480,9 +497,10 @@ def interactive_search_with_autocomplete(book: AddressBook) -> str:
             results = book.smart_search(search_term)
             if results:
                 # Here we make sure to pass the search_term to highlight it
-                return "\n".join(
-                    [display_contact(contact, search_term) for contact in results]
-                )
+                return "\n".join([
+                    display_contact(contact, search_term)
+                    for contact in results
+                ])
 
             print(warning("No contacts found matching the search term."))
         except KeyboardInterrupt:
