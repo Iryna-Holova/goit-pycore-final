@@ -108,7 +108,6 @@ class Note:
         self.reminder = Reminder(remind_date)
 
     def __str__(self):
-        tags_str = ", ".join(map(str, self.tags)) if self.tags else ""
         """
         Returns a string containing the title, text, tags, created_on,
         reminder of note.
@@ -117,6 +116,7 @@ class Note:
         str: A string containing title, text, tags, created_on, reminder of
         note.
         """
+        tags_str = ", ".join(map(str, self.tags)) if self.tags else ""
         return (
             f"title: {self.title}\n"
             f"text: {self.text}\n"
