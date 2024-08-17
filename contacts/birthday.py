@@ -3,6 +3,7 @@ Birthday field module.
 """
 
 from datetime import datetime
+from constants.validation import DATE_FORMAT, validation_errors
 
 
 class Birthday:
@@ -12,10 +13,12 @@ class Birthday:
 
     def __init__(self, value: str) -> None:
         try:
-            birthday = datetime.strptime(value, "%d.%m.%Y").date()
+            birthday = datetime.strptime(value, DATE_FORMAT).date()
+            if birthday > datetime.now().date():
+                raise ValueError(validation_errors["future_birthday"])
             self.value = birthday
         except ValueError as exc:
-            raise ValueError("Invalid date format. Use DD.MM.YYYY") from exc
+            raise ValueError(validation_errors["invalid_birthday"]) from exc
 
     def __str__(self) -> str:
-        return self.value.strftime("%d.%m.%Y")
+        return self.value.strftime(DATE_FORMAT)

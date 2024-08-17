@@ -4,8 +4,11 @@ Address book module.
 
 from collections import UserDict
 from datetime import datetime
-from contacts.record import Record
 from fuzzywuzzy import process
+from contacts.record import Record
+from constants.validation import DATE_FORMAT, validation_errors
+from constants.info_messages import info_messages
+
 
 class AddressBook(UserDict):
     """
@@ -24,7 +27,9 @@ class AddressBook(UserDict):
         """
         normalized_name = new_record.name.value.lower()
         if normalized_name in self.data:
-            raise ValueError(f"Contact {new_record.name.value} already exists")
+            raise ValueError(
+                validation_errors["duplicate_name"].format(new_record.name.value)
+            )
         self.data[normalized_name] = new_record
 
     def find(self, contact_name: str) -> Record:
@@ -43,7 +48,7 @@ class AddressBook(UserDict):
         normalized_name = contact_name.strip().lower()
         if normalized_name in self.data:
             return self.data[normalized_name]
-        raise ValueError(f"Contact {contact_name} not found")
+        raise ValueError(validation_errors["name_not_found"].format(contact_name))
 
     def delete(self, contact_name: str) -> None:
         """
@@ -57,10 +62,10 @@ class AddressBook(UserDict):
         """
         normalized_name = contact_name.lower()
         if normalized_name not in self.data:
-            raise ValueError(f"Contact {contact_name} not found")
+            raise ValueError(validation_errors["name_not_found"].format(contact_name))
         del self.data[normalized_name]
 
-    def upcoming_birthdays(self, days: int) -> dict:
+    def upcoming_birthdays(self, days: int, short: bool = False) -> str:
         """
         Calculate upcoming birthdays within a number of days for a given list
         of users.
@@ -90,19 +95,30 @@ class AddressBook(UserDict):
                 upcoming_birthdays[birthday_this_year] = contact.name.value
 
         sorted_birthdays = {
-            date.strftime("%d.%m.%Y"): name
+            date.strftime(DATE_FORMAT): name
             for date, name in sorted(upcoming_birthdays.items())
         }
-        return "\n".join(f"{date}: {name}" for date, name in sorted_birthdays.items())
-    
-    
+
+        if short:
+            return (
+                info_messages["upcoming_birthdays"].format(len(sorted_birthdays), days)
+                if sorted_birthdays
+                else info_messages["no_birthdays"].format(days)
+            )
+        return (
+            "\n".join(f"{date}: {name}" for date, name in sorted_birthdays.items())
+            if sorted_birthdays
+            else info_messages["no_birthdays"].format(days)
+        )
+
     def search(self, search_term: str) -> list:
         """
         Searches for contacts by name or phone number.
-        
+
         Args:
-            search_term (str): The term to search for in the contact names and phone numbers.
-        
+            search_term (str): The term to search for in the contact names and
+            phone numbers.
+
         Returns:
             list: A list of `Record` instances that match the search term.
         """
@@ -112,38 +128,46 @@ class AddressBook(UserDict):
         for record in self.data.values():
             if search_term in record.name.value.lower():
                 results.append(record)
-                continue  
+                continue
 
             for phone in record.phones:
                 if search_term in str(phone):
                     results.append(record)
-                    break  
+                    break
 
         return results
-    
 
     def smart_search(self, search_term: str, limit: int = 5) -> list:
         """
-        Smart search that finds contacts even with typos and suggests contacts as the user types.
-        
+        Smart search that finds contacts even with typos and suggests contacts
+        as the user types.
+
         Args:
-            search_term (str): The term to search for in the contact names and phone numbers.
+            search_term (str): The term to search for in the contact names and
+            phone numbers.
             limit (int): The maximum number of suggestions to return.
-        
+
             Returns:
-            list: A list of `Record` instances that match the search term with fuzzy matching.
+            list: A list of `Record` instances that match the search term with
+            fuzzy matching.
         """
         search_term = search_term.lower()
         names = [record.name.value for record in self.data.values()]
-        phone_numbers = [(str(phone), record.name.value) for record in self.data.values() for phone in record.phones]
-        
+        phone_numbers = [
+            (str(phone), record.name.value)
+            for record in self.data.values()
+            for phone in record.phones
+        ]
+
         # Get fuzzy matches for names
         name_matches = process.extract(search_term, names, limit=limit)
-        matched_names = [match[0] for match in name_matches if match[1] >= 70]  # 70% similarity threshold
-        
+        matched_names = [
+            match[0] for match in name_matches if match[1] >= 70
+        ]  # 70% similarity threshold
+
         # Get matches for phone numbers
         phone_matches = [name for phone, name in phone_numbers if search_term in phone]
-        
+
         # Combine name and phone matches
         matched_names.extend(phone_matches)
         matched_names = list(set(matched_names))  # Remove duplicates
@@ -153,6 +177,6 @@ class AddressBook(UserDict):
             record = self.data.get(name.lower())  # Fetch the Record object
             if record:  # Ensure that it's a valid Record object
                 results.append(record)
-        
+
         # Return just the list of Record objects
         return results
