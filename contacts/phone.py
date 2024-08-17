@@ -2,6 +2,10 @@
 Phone field module.
 """
 
+import re
+from typing import Union
+from constants.validation import PHONE_PATTERN, validation_errors
+
 
 class Phone:
     """
@@ -18,8 +22,8 @@ class Phone:
         Raises:
             ValueError: If the phone number does not consist of 10 digits.
         """
-        if not phone.isdigit() or len(phone) != 10:
-            raise ValueError("Phone number must consist of 10 digits")
+        if not re.match(PHONE_PATTERN, phone):
+            raise ValueError(validation_errors["invalid_phone"])
         self.value = phone
 
     def __repr__(self) -> str:
@@ -31,7 +35,7 @@ class Phone:
         """
         return self.value
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Union[str, "Phone"]) -> bool:
         """
         Checks if two Phone instances are equal.
 

@@ -9,10 +9,14 @@ from time import sleep
 from rich.progress import Progress
 from contacts.address_book import AddressBook
 from contacts.record import Record
-from helpers.colors import green, blue, success, warning, danger
+from helpers.colors import green, blue, dim, success, warning, danger
 from helpers.generate_data import generate_random_contact
 from helpers.completer import Prompt
 from helpers.display import display_contacts, display_contact
+from constants.questions import questions
+from constants.info_messages import info_messages
+from constants.commands import commands
+from constants.validation import validation_errors
 
 
 def add_contact(book: AddressBook) -> str:
@@ -29,15 +33,18 @@ def add_contact(book: AddressBook) -> str:
     """
     try:
         while True:
-            name = input(blue("Enter name: "))
+            name = input(dim(questions["back"]) + blue(questions["name"]))
             if name.strip().lower() in book.data:
-                print(warning("Contact already exists."))
+                print(
+                    dim(questions["back"])
+                    + warning(validation_errors["duplicate_name"]).format(name)
+                )
                 continue
             try:
                 new_record = Record(name)
                 break
             except ValueError as e:
-                print(danger(str(e)))
+                print(dim(questions["back"]) + danger(str(e)))
                 continue
 
         add_phones(new_record)
@@ -46,9 +53,9 @@ def add_contact(book: AddressBook) -> str:
         edit_address(new_record)
         book.add_record(new_record)
         print(display_contact(new_record))
-        return success("Contact was added.")
+        return success(info_messages["contact_added"])
     except KeyboardInterrupt:
-        return danger("\nOperation canceled.")
+        return danger(info_messages["operation_cancelled"])
 
 
 def change_contact(book: AddressBook) -> str:
@@ -65,59 +72,71 @@ def change_contact(book: AddressBook) -> str:
     prompt = Prompt()
     try:
         while True:
-            name = prompt.prompt("Enter name: ", list(book))
+            question = dim(questions["back"]) + blue(questions["name"])
+            print(question, end="")
+            name = prompt.prompt(
+                " " * len(questions["back"] + questions["name"]), list(book)
+            )
+            print("\033[F\033[K", end="")
+            print(f"{question}{name}")
             try:
                 contact = book.find(name)
                 break
             except ValueError as e:
-                print(danger(str(e)))
+                print(dim(questions["back"]) + danger(str(e)))
                 continue
 
-        print(contact)
+        print(display_contact(contact))
         while True:
-            commands = {
-                "add-phones": add_phones,
+            all_commands = {
+                commands["main_menu"]: None,
+                commands["add_phones"]: add_phones,
             }
             if contact.phones:
-                commands["remove-phones"] = remove_phone
+                all_commands[commands["remove_phone"]] = remove_phone
             if contact.birthday:
-                commands["remove-birthday"] = contact.remove_birthday
-                commands["edit-birthday"] = edit_birthday
+                all_commands[commands["remove_birthday"]] = remove_birthday
+                all_commands[commands["edit_birthday"]] = edit_birthday
             else:
-                commands["add-birthday"] = edit_birthday
+                all_commands[commands["add_birthday"]] = edit_birthday
             if contact.email:
-                commands["remove-email"] = contact.remove_email
-                commands["edit-email"] = edit_email
+                all_commands[commands["remove_email"]] = remove_email
+                all_commands[commands["edit_email"]] = edit_email
             else:
-                commands["add-email"] = edit_email
+                all_commands[commands["add_email"]] = edit_email
             if contact.address:
-                commands["remove-address"] = contact.remove_address
-                commands["edit-address"] = edit_address
+                all_commands[commands["remove_address"]] = remove_address
+                all_commands[commands["edit_address"]] = edit_address
             else:
-                commands["add-address"] = edit_address
-            print(green(f"Choose a command: {", ".join(list(commands))}"))
+                all_commands[commands["add_address"]] = edit_address
+            print(dim(questions["back"] + f"Options: {", ".join(list(all_commands))}"))
+            question = dim(questions["back"]) + blue(questions["command"])
+            print(question, end="")
             command = prompt.prompt(
-                "Enter a command or press Enter to quit: ", list(commands)
+                " " * len(questions["back"] + questions["command"]), list(all_commands)
             )
-            if not command:
+            print("\033[F\033[K", end="")
+            print(f"{question}{command}")
+
+            if command == commands["main_menu"]:
                 break
-            if command in commands:
-                commands[command](contact)
+            if command in all_commands:
+                all_commands[command](contact)
                 is_edited = True
-                print(contact)
+                print(display_contact(contact))
             else:
-                print(danger("Invalid command."))
+                print(dim(questions["back"]) + danger(info_messages["unknown_command"]))
                 continue
         return (
-            success("Contact was edited.")
+            success(info_messages["contact_edited"])
             if is_edited
-            else danger("\nOperation canceled.")
+            else danger(info_messages["operation_cancelled"])
         )
     except KeyboardInterrupt:
         return (
-            success("Contact was edited.")
+            success(info_messages["contact_edited"])
             if is_edited
-            else danger("\nOperation canceled.")
+            else danger(info_messages["operation_cancelled"])
         )
 
 
@@ -133,13 +152,15 @@ def add_phones(contact: Record) -> None:
     """
     while True:
         try:
-            phone = input(blue("Enter phone number or press Enter to skip: "))
+            phone = input(
+                dim(questions["back"]) + blue(questions["phone"] + questions["skip"])
+            )
             if not phone:
                 break
             contact.add_phone(phone)
-            print(green("Phone number added."))
+            print(dim(questions["back"]) + green(info_messages["phone_added"]))
         except ValueError as e:
-            print(danger(str(e)))
+            print(dim(questions["back"]) + danger(str(e)))
             continue
 
 
@@ -156,18 +177,23 @@ def remove_phone(contact: Record) -> None:
     prompt = Prompt()
     while True:
         try:
-            phone = prompt.prompt(
-                "Enter phone number or press Enter to skip: ",
-                list(map(str, contact.phones)),
-                True,
-                style="cyan",
+            question = dim(questions["back"]) + blue(
+                questions["phone"] + questions["skip"]
             )
+
+            print(question, end="")
+            phone = prompt.prompt(
+                " " * len(questions["back"] + questions["phone"] + questions["skip"]),
+                list(map(str, contact.phones)),
+            )
+            print("\033[F\033[K", end="")
+            print(f"{question}{phone}")
             if not phone:
                 break
             contact.remove_phone(phone)
-            print(green("Phone number removed."))
+            print(dim(questions["back"]) + green(info_messages["phone_removed"]))
         except ValueError as e:
-            print(danger(str(e)))
+            print(dim(questions["back"]) + danger(str(e)))
             continue
 
 
@@ -183,15 +209,31 @@ def edit_birthday(contact: Record) -> None:
     """
     while True:
         try:
-            birthday = input(blue("Enter birthday or press Enter to skip: "))
+            birthday = input(
+                dim(questions["back"]) + blue(questions["birthday"] + questions["skip"])
+            )
             if not birthday:
                 break
             contact.add_birthday(birthday)
-            print(green("Birthday added."))
+            print(dim(questions["back"]) + green(info_messages["birthday_added"]))
             break
         except ValueError as e:
-            print(danger(str(e)))
+            print(dim(questions["back"]) + danger(str(e)))
             continue
+
+
+def remove_birthday(contact: Record) -> None:
+    """
+    Removes the birthday from the `contact`.
+
+    Args:
+        contact (Record): An instance of the `Record` class.
+
+    Returns:
+        None
+    """
+    contact.remove_birthday()
+    print(dim(questions["back"]) + green(info_messages["birthday_removed"]))
 
 
 def edit_address(contact: Record) -> None:
@@ -206,15 +248,31 @@ def edit_address(contact: Record) -> None:
     """
     while True:
         try:
-            address = input(blue("Enter address or press Enter to skip: "))
+            address = input(
+                dim(questions["back"]) + blue(questions["address"] + questions["skip"])
+            )
             if not address:
                 break
             contact.add_address(address)
-            print(green("Address added."))
+            print(dim(questions["back"]) + green(info_messages["address_added"]))
             break
         except ValueError as e:
-            print(danger(str(e)))
+            print(dim(questions["back"]) + danger(str(e)))
             continue
+
+
+def remove_address(contact: Record) -> None:
+    """
+    Removes the address from the `contact`.
+
+    Args:
+        contact (Record): An instance of the `Record` class.
+
+    Returns:
+        None
+    """
+    contact.remove_address()
+    print(dim(questions["back"]) + green(info_messages["address_removed"]))
 
 
 def edit_email(contact: Record) -> None:
@@ -229,15 +287,31 @@ def edit_email(contact: Record) -> None:
     """
     while True:
         try:
-            email = input(blue("Enter email or press Enter to skip: "))
+            email = input(
+                dim(questions["back"]) + blue(questions["email"] + questions["skip"])
+            )
             if not email:
                 break
             contact.add_email(email)
-            print(green("Email added."))
+            print(dim(questions["back"]) + green(info_messages["email_added"]))
             break
         except ValueError as e:
-            print(danger(str(e)))
+            print(dim(questions["back"]) + danger(str(e)))
             continue
+
+
+def remove_email(contact: Record) -> None:
+    """
+    Removes the email from the `contact`.
+
+    Args:
+        contact (Record): An instance of the `Record` class.
+
+    Returns:
+        None
+    """
+    contact.remove_email()
+    print(dim(questions["back"]) + green(info_messages["email_removed"]))
 
 
 def delete_contact(book: AddressBook) -> str:
@@ -254,14 +328,20 @@ def delete_contact(book: AddressBook) -> str:
     prompt = Prompt()
     while True:
         try:
-            name = prompt.prompt("Enter name: ", list(book))
+            question = dim(questions["back"]) + blue(questions["name"])
+            print(question, end="")
+            name = prompt.prompt(
+                " " * len(questions["back"] + questions["name"]), list(book)
+            )
+            print("\033[F\033[K", end="")
+            print(f"{question}{name}")
             book.delete(name)
             break
         except ValueError as error:
-            print(warning(str(error)))
+            print(dim(questions["back"]) + danger(str(error)))
         except KeyboardInterrupt:
-            return danger("Operation canceled.")
-    return success(f"Contact {name} deleted.")
+            return danger(info_messages["operation_cancelled"])
+    return success(info_messages["contact_deleted"])
 
 
 def get_contacts(book: AddressBook) -> str:
@@ -284,7 +364,7 @@ def get_contacts(book: AddressBook) -> str:
             sleep(0.8)
 
     if not book.data:
-        return warning("Address book is empty.")
+        return warning(info_messages["no_contacts"])
 
     return display_contacts(book)
 
@@ -303,9 +383,9 @@ def birthdays(book: AddressBook) -> str:
         contacts in the `book` who have a birthday within the next 7 days.
     """
     while True:
-        days = input(blue("Enter number of days: "))
+        days = input(dim(questions["back"]) + blue(questions["days"]))
         if not days.isdigit():
-            print(warning("Invalid input. Please enter a valid number."))
+            print(dim(questions["back"]) + warning(validation_errors["invalid_number"]))
             continue
         return book.upcoming_birthdays(int(days))
 
@@ -324,14 +404,14 @@ def fake_contacts(book: AddressBook) -> str:
     """
     while True:
         try:
-            count = input(blue("Enter number of fake contacts: "))
+            count = input(blue(questions["contacts"]))
             if not count.isdigit():
-                print(warning("Invalid input. Please enter a valid number."))
+                print(warning(validation_errors["invalid_number"]))
                 continue
             count = int(count)
             break
         except KeyboardInterrupt:
-            return danger("\nOperation canceled.")
+            return danger(info_messages["operation_cancelled"])
 
     for _ in range(count):
         contact = generate_random_contact()
@@ -344,9 +424,12 @@ def fake_contacts(book: AddressBook) -> str:
             record.add_email(contact["email"])
         if contact["address"]:
             record.add_address(contact["address"])
-        book.add_record(record)
+        try:
+            book.add_record(record)
+        except ValueError as e:
+            print(danger(str(e)))
 
-    return success(f"{count} fake contacts added.")
+    return success(info_messages["fake_contacts_generated"])
 
 
 def search_contacts(book: AddressBook) -> str:
@@ -365,9 +448,7 @@ def search_contacts(book: AddressBook) -> str:
         if search_term.lower() == "q":
             return danger("Operation canceled.")
         if not search_term:
-            print(
-                warning("Invalid input. Please enter a valid search term or q to exit")
-            )
+            print(warning("Please enter a valid search term or q to exit"))
             continue
 
         results = book.search(search_term)
@@ -382,22 +463,26 @@ def interactive_search_with_autocomplete(book: AddressBook) -> str:
     """
     # Get all names from the address book for autocomplete suggestions
     contact_names = [record.name.value for record in book.data.values()]
-    
+
     prompt = Prompt()
 
     while True:
         try:
-            search_term = prompt.prompt("Enter search term (name or phone number): ", contact_names).strip()
+            search_term = prompt.prompt(
+                "Enter search term (name or phone number): ", contact_names
+            ).strip()
             if search_term.lower() == "q":
                 return danger("Operation canceled.")
             if not search_term:
-                print(warning("Invalid input. Please enter a valid search term or q to exit"))
+                print(warning("Please enter a valid search term or q to exit"))
                 continue
 
             results = book.smart_search(search_term)
             if results:
                 # Here we make sure to pass the search_term to highlight it
-                return "\n".join([display_contact(contact, search_term) for contact in results])
+                return "\n".join(
+                    [display_contact(contact, search_term) for contact in results]
+                )
 
             print(warning("No contacts found matching the search term."))
         except KeyboardInterrupt:
