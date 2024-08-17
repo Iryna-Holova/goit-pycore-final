@@ -5,8 +5,6 @@ The controllers module contains functions that interact with the user and
 modify the address book.
 """
 
-from time import sleep
-from rich.progress import Progress
 from contacts.address_book import AddressBook
 from contacts.record import Record
 from helpers.colors import green, blue, dim, success, warning, danger
