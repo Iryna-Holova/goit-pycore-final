@@ -4,6 +4,7 @@ Note module.
 
 from typing import List
 from notes.title import Title
+from notes.text import Text
 from notes.tag import Tag
 from notes.remainder import Reminder
 from notes.created_on import CreatedOn
@@ -31,10 +32,10 @@ class Note:
         Returns:
             None
         """
-        self.title = Title(title)
-        self.text = ""
+        self.title: Title = Title(title)
+        self.text: Text | None = None
         self.tags: List[Tag] = []
-        self.created_on = CreatedOn()
+        self.created_on: CreatedOn = CreatedOn()
         self.reminder: Reminder | None = None
 
     def add_text(self, text: str) -> None:
@@ -48,26 +49,31 @@ class Note:
             None
 
         Raises:
-            ValueError: If the text contains lower than 4 symbols and greater than 200 symbols.
+            ValueError: If the text contains lower than 4 symbols and greater
+            than 200 symbols.
         """
-        if len(text) > 200 or len(text) < 4:
+        normalize_text = text.strip()
+        if len(normalize_text) > 200:
             raise ValueError(
-                "Text must contains min 4 symbols and max 200 symbols")
-        self.text = text.strip()
+                "Text must contains max 200 symbols")
+        self.text = Text(normalize_text)
 
-    def add_tag(self, tag: str) -> None:
+    def add_tags(self, tags: str) -> None:
         """
-        Adds tag to the note.
+        Adds tags to the note. Tags are separated by spaces.
 
         Args:
-            tag (str): The tag to add.
+            tags (str): A string of tags separated by spaces.
 
         Returns:
             None
         """
-        tag_normalize_val = tag.strip().lower()
-        if tag not in self.tags:
-            self.tags.append(Tag(tag_normalize_val))
+
+        tag_list = tags.split()
+
+        for tag in tag_list:
+            if tag.lower() not in self.tags:
+                self.tags.append(Tag(tag))
 
     def remove_tag(self, tag: str):
         """
@@ -102,18 +108,19 @@ class Note:
         self.reminder = Reminder(remind_date)
 
     def __str__(self):
-        tags_str = ", ".join(map(str, self.tags)) if self.tags else ""
         """
-        Returns a string containing the title, text, tags, created_on, reminder of note.
+        Returns a string containing the title, text, tags, created_on,
+        reminder of note.
 
         Returns:
-        str: A string containing title, text, tags, created_on, reminder of note.
+        str: A string containing title, text, tags, created_on, reminder of
+        note.
         """
+        tags_str = ", ".join(map(str, self.tags)) if self.tags else ""
         return (
             f"title: {self.title}\n"
             f"text: {self.text}\n"
             f"tags: {tags_str}\n"
             f"created_on: {self.created_on}\n"
             f"reminder: {self.reminder}"
-
         )

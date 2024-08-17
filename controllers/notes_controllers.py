@@ -37,9 +37,10 @@ def add_note(book: NotesBook) -> str:
             except ValueError as e:
                 print(danger(str(e)))
         add_text(new_note)
-        add_tag(new_note)
+        add_tags(new_note)
+        add_reminder(new_note)
         book.add_note(new_note)
-        return str(title) + success("Note was added.")
+        return success("Note was added.")
     except KeyboardInterrupt:
         return danger("\nOperation canceled.")
 
@@ -74,15 +75,11 @@ def change_note(book: NotesBook) -> str:
         while True:
             commands = {
                 "edit-text": edit_text,
-                "add-tag": add_tag,
+                "add-tags": add_tags,
                 "add-reminder": add_reminder,
                 "remove-tag": remove_tag,
             }
-            print(
-                green(
-                    "Choose a command: add-tag, remove-tag, " "add-reminder, edit-text"
-                )
-            )
+            print(green(f"Choose a command: {", ".join(list(commands))}"))
             command = session.prompt(
                 "Enter a command or press Enter to quit: ",
                 completer=CustomCompleter(list(commands)),
@@ -127,12 +124,13 @@ def add_text(note: Note) -> None:
                 break
             note.add_text(text)
             print(green("Text added."))
+            break
         except ValueError as e:
             print(danger(str(e)))
             continue
 
 
-def add_tag(note: Note) -> None:
+def add_tags(note: Note) -> None:
     """
     Adds tag to the `note`.
 
@@ -144,11 +142,12 @@ def add_tag(note: Note) -> None:
     """
     while True:
         try:
-            tag = input(blue("Enter tag or press Enter to skip: "))
+            tag = input(blue("Enter tags or press Enter to skip: "))
             if not tag:
                 break
-            note.add_tag(tag)
-            print(green("Tag added."))
+            note.add_tags(tag)
+            print(green("Tags added."))
+            break
         except ValueError as e:
             print(danger(str(e)))
             continue
@@ -156,15 +155,15 @@ def add_tag(note: Note) -> None:
 
 def get_notes(book: NotesBook) -> str:
     """
-    Returns a string containing the title, text, tags, created_on, reminder of all notes
-    in the `book`.
+    Returns a string containing the title, text, tags, created_on, reminder of
+    all notes in the `book`.
 
     Args:
         book (NotesBook): An instance of the `NotesBook` class.
 
     Returns:
-        str: A string containing title, text, tags, created_on, reminder of all notes
-        in the `book`.
+        str: A string containing title, text, tags, created_on, reminder of
+        all notes in the `book`.
     """
 
     if not book.data:
@@ -257,11 +256,12 @@ def add_reminder(note: Note) -> None:
     """
     while True:
         try:
-            reminder = input(blue("Enter date or press Enter to skip: "))
+            reminder = input(blue("Enter reminder or press Enter to skip: "))
             if not reminder:
                 break
             note.set_reminder(reminder)
             print(green("Reminder added."))
+            break
         except ValueError as e:
             print(danger(str(e)))
             continue
@@ -295,9 +295,37 @@ def fake_notes(book: NotesBook) -> str:
         if note_data["text"]:
             note.add_text(note_data["text"])
         for tag in note_data["tags"]:
-            note.add_tag(tag)
+            note.add_tags(tag)
         if note_data["reminder"]:
             note.set_reminder(note_data["reminder"])
         book.add_note(note)
 
     return success(f"{count} fake contacts added.")
+
+
+def reminders(book: NotesBook) -> str:
+    """
+    Returns a string containing the titles and reminder dates of all notes
+    in the `book` that have a reminder within the next specified number of
+    days.
+
+    Args:
+        book (NotesBook): An instance of the `NotesBook` class.
+
+    Returns:
+        str: A string containing the titles and reminder dates of all notes
+        in the `book` that have a reminder within the next specified number
+        of days.
+        If there are no reminders within the specified period, a warning
+        message is returned.
+    """
+    while True:
+        days = input(blue("Enter number of days: "))
+        if not days.isdigit():
+            print(warning("Invalid input. Please enter a valid number."))
+            continue
+        notes = book.upcoming_reminders(int(days))
+        if not notes:
+            return warning(f"No reminders in {days} days.")
+
+        return "\n".join(map(str, notes))

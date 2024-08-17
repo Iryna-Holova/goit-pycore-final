@@ -21,7 +21,8 @@ class Reminder:
             remind_date (str): The reminder date in the format DD.MM.YYYY.
 
         Raises:
-            ValueError: If the date format is invalid or the date is not in the future.
+            ValueError: If the date format is invalid or the date is not in
+            the future.
         """
         self.set_reminder(remind_date)
 
@@ -33,16 +34,17 @@ class Reminder:
             new_date (str): The new reminder date in the format DD.MM.YYYY.
 
         Raises:
-            ValueError: If the date format is invalid or the date is not in the future.
+            ValueError: If the date format is invalid or the date is not in
+            the future.
         """
         try:
-            remind_datetime = datetime.strptime(new_date, "%d.%m.%Y")
-            self.value = remind_datetime
+            remind_datetime = datetime.strptime(new_date, "%d.%m.%Y").date()
         except ValueError as exc:
             raise ValueError("Invalid date format. Use DD.MM.YYYY") from exc
 
-        if remind_datetime <= datetime.now():
+        if remind_datetime <= datetime.now().date():
             raise ValueError("Date must be greater than today")
+        self.value = remind_datetime
 
     def is_reminder_due(self, days: int) -> bool:
         """
@@ -52,7 +54,8 @@ class Reminder:
             days (int): The number of days to check if the reminder is due.
 
         Returns:
-            bool: True if the reminder is due within the specified number of days, False otherwise.
+            bool: True if the reminder is due within the specified number of
+            days, False otherwise.
         """
         today = datetime.now()
         end_date = today + timedelta(days=days)

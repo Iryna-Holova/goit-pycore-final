@@ -1,7 +1,7 @@
 """
 NotesBook module.
 """
-
+from datetime import datetime
 from collections import UserDict
 from notes.note import Note
 
@@ -70,7 +70,10 @@ class NotesBook(UserDict):
             list[Note]: A list of notes containing the specified tag.
         """
         tag_normalized = tag.strip().lower()
-        return [note for note in self.data.values() if any(t.value.lower() == tag_normalized for t in note.tags)]
+        return [
+            note for note in self.data.values()
+            if any(t.value.lower() == tag_normalized for t in note.tags)
+        ]
 
     def sort_notes_by_tag(self, tag: str) -> list[Note]:
         """
@@ -80,7 +83,8 @@ class NotesBook(UserDict):
             tag (str): The tag to sort by.
 
         Returns:
-            list[Note]: A list of notes sorted by the presence of the specified tag.
+            list[Note]: A list of notes sorted by the presence of the
+            specified tag.
         """
         tag_normalized = tag.strip().lower()
         tagged_notes = [note for note in self.data.values() if any(
@@ -96,3 +100,27 @@ class NotesBook(UserDict):
             set: A set of unique tags.
         """
         return {tag.value for note in self.data.values() for tag in note.tags}
+
+    def upcoming_reminders(self, days: int) -> list:
+        """
+        Calculate upcoming reminders within a number of days.
+
+        Args:
+            days (int): The number of days to check for upcoming reminders.
+
+        Returns:
+            list: A list of notes with upcoming reminders within the given
+            number of days.
+        """
+        today = datetime.today().date()
+        upcoming_reminders = {}
+
+        for note in self.data.values():
+            if note.reminder is None or note.reminder.value < today:
+                continue
+            days_until_reminder = (note.reminder.value - today).days
+            if 0 <= days_until_reminder <= days:
+                upcoming_reminders[note.reminder.value] = note
+        sorted_reminders = dict(sorted(upcoming_reminders.items()))
+
+        return sorted_reminders.values()

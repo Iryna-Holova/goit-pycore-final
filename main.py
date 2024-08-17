@@ -8,11 +8,13 @@ from helpers.serialize import save_data, load_data
 from helpers.colors import green, danger, success
 from helpers.help import get_help
 from notes.notes_book import NotesBook
+from contacts.address_book import AddressBook
 from controllers.notes_controllers import (
     add_note,
     change_note,
     delete_note,
     get_notes,
+    reminders,
     fake_notes,
 )
 from controllers.contacts_controllers import (
@@ -41,6 +43,7 @@ notes_controllers = {
     "delete-note": delete_note,
     "all-notes": get_notes,
     "fake-notes": fake_notes,
+    "reminders": reminders
 }
 
 
@@ -48,19 +51,20 @@ def main():
     """
     The main function that serves as the entry point for the application.
     """
-    book = load_data()
-    notes_book = NotesBook()
+    book = load_data("address_book.pkl", default_data=AddressBook())
+    notes_book = load_data("notes_book.pkl", default_data=NotesBook())
     print(success("Welcome to the assistant bot!"))
-
-    commands = list(controllers) + ["close", "exit"]
+    commands = list(controllers) + list(notes_controllers) + ["close", "exit"]
     prompt = Prompt()
 
     while True:
         try:
-            command = prompt.prompt("Enter a command: ", commands).strip().lower()
+            command = prompt.prompt(
+                "Enter a command: ", commands).strip().lower()
         except KeyboardInterrupt:
             print("Good bye!")
-            save_data(book)
+            save_data(book, "address_book.pkl")
+            save_data(notes_book, "notes_book.pkl")
             break
 
         if not command:
@@ -68,7 +72,8 @@ def main():
 
         if command in ["close", "exit"]:
             print("Good bye!")
-            save_data(book)
+            save_data(notes_book, "notes_book.pkl")
+            save_data(book, "address_book.pkl")
             break
 
         if command == "hello":

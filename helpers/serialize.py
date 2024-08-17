@@ -2,47 +2,55 @@
 Serialize and deserialize address book data
 """
 
-from rich.progress import Progress
-from time import sleep
 import pickle
+from time import sleep
+from typing import Union
+from rich.progress import Progress
+from notes.notes_book import NotesBook
 from contacts.address_book import AddressBook
 
 
-def save_data(book: AddressBook, filename: str = "addressbook.pkl") -> None:
+def save_data(data: Union["AddressBook", "NotesBook"], filename: str) -> None:
     """
-    Saves the provided address book data to a file.
+    Saves the provided data to a file.
 
     Args:
-        book (AddressBook): The address book data to be saved.
-        filename (str, optional): The name of the file where the data will be
-        saved. Defaults to "addressbook.pkl".
+        data: The data to be saved, can be of any serializable type.
+        filename (str): The name of the file where the data will be saved.
 
     Returns:
         None
     """
     with Progress() as progress:
-        task = progress.add_task("[blue]Saving data to file...", total=100)
+        task = progress.add_task(
+            f"[blue]Saving data to {filename}...", total=100
+        )
         while not progress.finished:
             progress.update(task, advance=100)
             sleep(0.8)
     with open(filename, "wb") as f:
-        pickle.dump(book, f)
+        pickle.dump(data, f)
 
 
-def load_data(filename: str = "addressbook.pkl") -> AddressBook:
+def load_data(
+    filename: str,
+    default_data: Union["AddressBook", "NotesBook"] = None
+) -> Union["AddressBook", "NotesBook"]:
     """
-    Loads address book data from a file.
+    Loads data from a file.
 
     Args:
-        filename (str, optional): The name of the file where the data will be
-        loaded from. Defaults to "addressbook.pkl".
+        filename (str): The name of the file from which the data will be
+        loaded.
+        default_data: The default data to return if the file is not found.
 
     Returns:
-        AddressBook: The loaded address book data, or a new AddressBook
-        instance if the file is not found.
+        The loaded data or default_data if the file is not found.
     """
     with Progress() as progress:
-        task = progress.add_task("[blue]Loading data from file...", total=100)
+        task = progress.add_task(
+            f"[blue]Loading data from {filename}...", total=100
+        )
         while not progress.finished:
             progress.update(task, advance=100)
             sleep(0.8)
@@ -50,4 +58,4 @@ def load_data(filename: str = "addressbook.pkl") -> AddressBook:
         with open(filename, "rb") as f:
             return pickle.load(f)
     except FileNotFoundError:
-        return AddressBook()
+        return default_data
