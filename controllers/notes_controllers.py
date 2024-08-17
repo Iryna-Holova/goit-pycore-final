@@ -10,6 +10,7 @@ from helpers.colors import green, blue, success, warning, danger
 from helpers.completer import CustomCompleter
 from helpers.completer import Prompt
 from helpers.generate_data import generate_random_note
+from helpers.display import display_notes, display_note, display_reminders
 from notes.notes_book import NotesBook
 from notes.note import Note
 
@@ -40,6 +41,7 @@ def add_note(book: NotesBook) -> str:
         add_tags(new_note)
         add_reminder(new_note)
         book.add_note(new_note)
+        print(display_note(new_note))
         return success("Note was added.")
     except KeyboardInterrupt:
         return danger("\nOperation canceled.")
@@ -169,7 +171,7 @@ def get_notes(book: NotesBook) -> str:
     if not book.data:
         return warning("Notes book is empty.")
 
-    return "\n".join(map(str, book.data.values()))
+    return display_notes(book)
 
 
 def edit_text(note: Note) -> None:
@@ -328,4 +330,4 @@ def reminders(book: NotesBook) -> str:
         if not notes:
             return warning(f"No reminders in {days} days.")
 
-        return "\n".join(map(str, notes))
+        return display_reminders(book, int(days))

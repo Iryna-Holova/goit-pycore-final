@@ -4,8 +4,11 @@ Address book module.
 
 from collections import UserDict
 from datetime import datetime
-from contacts.record import Record
 from fuzzywuzzy import process
+from tabulate import tabulate
+from contacts.record import Record
+from helpers.colors import warning, red
+
 
 class AddressBook(UserDict):
     """
@@ -93,16 +96,21 @@ class AddressBook(UserDict):
             date.strftime("%d.%m.%Y"): name
             for date, name in sorted(upcoming_birthdays.items())
         }
-        return "\n".join(f"{date}: {name}" for date, name in sorted_birthdays.items())
-    
-    
+        if not sorted_birthdays:
+            return warning(f"No birthdays in the next {days} days.")
+
+        headers = ["Date", "Name"]
+        colored_headers = [red(header) for header in headers]
+        table = [[date, name] for date, name in sorted_birthdays.items()]
+
+        return tabulate(table, headers=colored_headers, tablefmt="grid")
+
     def search(self, search_term: str) -> list:
         """
         Searches for contacts by name or phone number.
-        
         Args:
-            search_term (str): The term to search for in the contact names and phone numbers.
-        
+            search_term (str): The term to search for in the contact names and
+            phone numbers.
         Returns:
             list: A list of `Record` instances that match the search term.
         """
@@ -112,38 +120,44 @@ class AddressBook(UserDict):
         for record in self.data.values():
             if search_term in record.name.value.lower():
                 results.append(record)
-                continue  
+                continue
 
             for phone in record.phones:
                 if search_term in str(phone):
                     results.append(record)
-                    break  
+                    break
 
         return results
-    
 
     def smart_search(self, search_term: str, limit: int = 5) -> list:
         """
-        Smart search that finds contacts even with typos and suggests contacts as the user types.
-        
+        Smart search that finds contacts even with typos and suggests contacts
+          as the user types.
         Args:
-            search_term (str): The term to search for in the contact names and phone numbers.
+            search_term (str): The term to search for in the contact names and
+              phone numbers.
             limit (int): The maximum number of suggestions to return.
-        
             Returns:
-            list: A list of `Record` instances that match the search term with fuzzy matching.
+            list: A list of `Record` instances that match the search term with
+              fuzzy matching.
         """
         search_term = search_term.lower()
         names = [record.name.value for record in self.data.values()]
-        phone_numbers = [(str(phone), record.name.value) for record in self.data.values() for phone in record.phones]
-        
+        phone_numbers = [
+            (str(phone), record.name.value)
+            for record in self.data.values()
+            for phone in record.phones
+        ]
+
         # Get fuzzy matches for names
         name_matches = process.extract(search_term, names, limit=limit)
-        matched_names = [match[0] for match in name_matches if match[1] >= 70]  # 70% similarity threshold
-        
+        matched_names = [match[0] for match in name_matches if match[1] >= 70]
+
         # Get matches for phone numbers
-        phone_matches = [name for phone, name in phone_numbers if search_term in phone]
-        
+        phone_matches = [
+            name for phone, name in phone_numbers if search_term in phone
+        ]
+
         # Combine name and phone matches
         matched_names.extend(phone_matches)
         matched_names = list(set(matched_names))  # Remove duplicates
@@ -153,6 +167,6 @@ class AddressBook(UserDict):
             record = self.data.get(name.lower())  # Fetch the Record object
             if record:  # Ensure that it's a valid Record object
                 results.append(record)
-        
+
         # Return just the list of Record objects
         return results
