@@ -5,6 +5,8 @@ Address book module.
 from collections import UserDict
 from datetime import datetime
 from fuzzywuzzy import process
+from tabulate import tabulate
+from helpers.colors import warning, red
 from contacts.record import Record
 from constants.validation import DATE_FORMAT, validation_errors
 from constants.info_messages import info_messages
@@ -98,27 +100,21 @@ class AddressBook(UserDict):
             date.strftime(DATE_FORMAT): name
             for date, name in sorted(upcoming_birthdays.items())
         }
+        if not sorted_birthdays:
+            return warning(f"No birthdays in the next {days} days.")
 
-        if short:
-            return (
-                info_messages["upcoming_birthdays"].format(len(sorted_birthdays), days)
-                if sorted_birthdays
-                else info_messages["no_birthdays"].format(days)
-            )
-        return (
-            "\n".join(f"{date}: {name}" for date, name in sorted_birthdays.items())
-            if sorted_birthdays
-            else info_messages["no_birthdays"].format(days)
-        )
+        headers = ["Date", "Name"]
+        colored_headers = [red(header) for header in headers]
+        table = [[date, name] for date, name in sorted_birthdays.items()]
+
+        return tabulate(table, headers=colored_headers, tablefmt="grid")
 
     def search(self, search_term: str) -> list:
         """
         Searches for contacts by name or phone number.
-
         Args:
             search_term (str): The term to search for in the contact names and
             phone numbers.
-
         Returns:
             list: A list of `Record` instances that match the search term.
         """
@@ -140,16 +136,14 @@ class AddressBook(UserDict):
     def smart_search(self, search_term: str, limit: int = 5) -> list:
         """
         Smart search that finds contacts even with typos and suggests contacts
-        as the user types.
-
+          as the user types.
         Args:
             search_term (str): The term to search for in the contact names and
-            phone numbers.
+              phone numbers.
             limit (int): The maximum number of suggestions to return.
-
             Returns:
             list: A list of `Record` instances that match the search term with
-            fuzzy matching.
+              fuzzy matching.
         """
         search_term = search_term.lower()
         names = [record.name.value for record in self.data.values()]

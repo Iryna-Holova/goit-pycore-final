@@ -1,13 +1,16 @@
+import re
 import textwrap
 from tabulate import tabulate
+
 from contacts.address_book import AddressBook
 from contacts.record import Record
-import re
-from helpers.colors import blue, green, success
+from notes.notes_book import NotesBook
+from notes.note import Note
+from helpers.colors import blue, green, yellow, warning
 
 
 def wrap_text(text, width=20):
-    return "\n".join(textwrap.wrap(text, width=width))
+    return "\n".join(textwrap.wrap(str(text), width=width))
 
 
 def display_contacts(book: AddressBook) -> str:
@@ -38,36 +41,29 @@ def display_contacts(book: AddressBook) -> str:
 def highlight_term(text: str, term: str, bg_color_code: str = "\033[43m") -> str:
     """
     Highlights the term in the text by changing the background color.
-
     Args:
         text (str): The text to search in.
         term (str): The term to highlight.
-        bg_color_code (str): The ANSI background color code to use for highlighting (default is yellow).
-
+        bg_color_code (str): The ANSI background color code to use for
+        highlighting
+            (default is yellow).
     Returns:
         str: The text with the term highlighted with a background color.
     """
     term = re.escape(term)
     highlighted_text = re.sub(
-        f"({term})", f"{bg_color_code}\\1\033[0m", text, flags=re.IGNORECASE
+        f'({term})',
+        f'{bg_color_code}\\1\033[0m',
+        text,
+        flags=re.IGNORECASE
     )
     return highlighted_text
 
 
-def display_contact(contact: Record, search_term: str = "") -> str:
-    """
-    Displays a single contact with the option to highlight the search term in the contact name and phones.
 
-    Args:
-        contact (Record): The contact to display.
-        search_term (str): The search term to highlight (optional).
-
-    Returns:
-        str: The formatted contact string with highlighted term in the name and phones.
-    """
-    headers = ["Name", "Phones", "Birthday", "Email", "Address"]
+def display_contact(contact: Record, search_term: str = '') -> str:
+    headers = ["Name", "Phones", "Birthday", "Address"]
     colored_headers = [green(header) for header in headers]
-
     # Highlight the search term in the name
     name_str = str(contact.name)
     if search_term:
@@ -89,6 +85,70 @@ def display_contact(contact: Record, search_term: str = "") -> str:
             str(contact.address) if contact.address else " - ",
         ]
     ]
+
+    table_str = tabulate(table, headers=colored_headers, tablefmt="grid")
+    return table_str
+
+
+def display_notes(book: NotesBook) -> str:
+    if not book.data:
+        return "Notes book is empty."
+
+    headers = ["Title", "Text", "Tags", "Created On", "Reminder"]
+    colored_headers = [blue(header) for header in headers]
+    table = []
+    for note in book.data.values():
+        tags_str = (", ".join([f"#{tag}" for tag in note.tags])
+                    if note.tags else " - ")
+        reminder_str = str(note.reminder) if note.reminder else " - "
+        table.append([
+            str(note.title),
+            wrap_text(note.text),
+            wrap_text(tags_str),
+            str(note.created_on),
+            reminder_str
+        ])
+
+    table_str = tabulate(table, headers=colored_headers, tablefmt="grid")
+    return table_str
+
+
+def display_note(note: Note) -> str:
+    headers = ["Title", "Text", "Tags", "Created On", "Reminder"]
+    colored_headers = [green(header) for header in headers]
+    tags_str = (", ".join([f"#{tag}" for tag in note.tags])
+                if note.tags else " - ")
+    reminder_str = str(note.reminder) if note.reminder else " - "
+    table = [[
+        str(note.title),
+        wrap_text(note.text),
+        wrap_text(tags_str),
+        str(note.created_on),
+        reminder_str
+    ]]
+
+    table_str = tabulate(table, headers=colored_headers, tablefmt="grid")
+    return table_str
+
+
+def display_reminders(book: NotesBook, days: int) -> str:
+    notes_with_reminders = book.upcoming_reminders(days)
+    if not notes_with_reminders:
+        return warning(f"No reminders in the next {days} days.")
+    headers = ["Title", "Text", "Tags", "Created On", "Reminder"]
+    colored_headers = [yellow(header) for header in headers]
+    table = []
+    for note in notes_with_reminders:
+        tags_str = (", ".join([f"#{tag}" for tag in note.tags])
+                    if note.tags else " - ")
+        reminder_str = str(note.reminder) if note.reminder else " - "
+        table.append([
+            str(note.title),
+            wrap_text(note.text),
+            wrap_text(tags_str),
+            str(note.created_on),
+            reminder_str
+        ])
 
     table_str = tabulate(table, headers=colored_headers, tablefmt="grid")
     return table_str

@@ -1,12 +1,12 @@
 """
 Main module.
 """
-
 from helpers.suggest import suggest_command
 from helpers.completer import Prompt
 from helpers.serialize import save_data, load_data
-from helpers.colors import green, danger, success
+from helpers.colors import green, danger, red
 from helpers.help import get_help
+from helpers.welcome import print_title
 from notes.notes_book import NotesBook
 from contacts.address_book import AddressBook
 from controllers.notes_controllers import (
@@ -55,7 +55,7 @@ def main():
     """
     book = load_data("address_book.pkl", default_data=AddressBook())
     notes_book = load_data("notes_book.pkl", default_data=NotesBook())
-    print(success("Welcome to the assistant bot!"))
+    print_title("Welcome to the assistant bot!", red)
     commands = list(controllers) + list(notes_controllers) + ["close", "exit"]
     prompt = Prompt()
 
