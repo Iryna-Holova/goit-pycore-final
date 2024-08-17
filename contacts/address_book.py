@@ -6,8 +6,10 @@ from collections import UserDict
 from datetime import datetime
 from fuzzywuzzy import process
 from tabulate import tabulate
-from contacts.record import Record
 from helpers.colors import warning, red
+from contacts.record import Record
+from constants.validation import DATE_FORMAT, validation_errors
+from constants.info_messages import info_messages
 
 
 class AddressBook(UserDict):
@@ -27,7 +29,9 @@ class AddressBook(UserDict):
         """
         normalized_name = new_record.name.value.lower()
         if normalized_name in self.data:
-            raise ValueError(f"Contact {new_record.name.value} already exists")
+            raise ValueError(
+                validation_errors["duplicate_name"].format(new_record.name.value)
+            )
         self.data[normalized_name] = new_record
 
     def find(self, contact_name: str) -> Record:
@@ -46,7 +50,7 @@ class AddressBook(UserDict):
         normalized_name = contact_name.strip().lower()
         if normalized_name in self.data:
             return self.data[normalized_name]
-        raise ValueError(f"Contact {contact_name} not found")
+        raise ValueError(validation_errors["name_not_found"].format(contact_name))
 
     def delete(self, contact_name: str) -> None:
         """
@@ -60,10 +64,10 @@ class AddressBook(UserDict):
         """
         normalized_name = contact_name.lower()
         if normalized_name not in self.data:
-            raise ValueError(f"Contact {contact_name} not found")
+            raise ValueError(validation_errors["name_not_found"].format(contact_name))
         del self.data[normalized_name]
 
-    def upcoming_birthdays(self, days: int) -> dict:
+    def upcoming_birthdays(self, days: int, short: bool = False) -> str:
         """
         Calculate upcoming birthdays within a number of days for a given list
         of users.
@@ -93,7 +97,7 @@ class AddressBook(UserDict):
                 upcoming_birthdays[birthday_this_year] = contact.name.value
 
         sorted_birthdays = {
-            date.strftime("%d.%m.%Y"): name
+            date.strftime(DATE_FORMAT): name
             for date, name in sorted(upcoming_birthdays.items())
         }
         if not sorted_birthdays:
@@ -151,12 +155,12 @@ class AddressBook(UserDict):
 
         # Get fuzzy matches for names
         name_matches = process.extract(search_term, names, limit=limit)
-        matched_names = [match[0] for match in name_matches if match[1] >= 70]
+        matched_names = [
+            match[0] for match in name_matches if match[1] >= 70
+        ]  # 70% similarity threshold
 
         # Get matches for phone numbers
-        phone_matches = [
-            name for phone, name in phone_numbers if search_term in phone
-        ]
+        phone_matches = [name for phone, name in phone_numbers if search_term in phone]
 
         # Combine name and phone matches
         matched_names.extend(phone_matches)

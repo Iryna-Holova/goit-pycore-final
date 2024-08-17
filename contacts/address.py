@@ -2,6 +2,12 @@
 Address field module.
 """
 
+from constants.validation import (
+    ADDRESS_MIN_LENGTH,
+    ADDRESS_MAX_LENGTH,
+    validation_errors,
+)
+
 
 class Address:
     """
@@ -18,8 +24,8 @@ class Address:
         Raises:
             ValueError: If the address does not meet the validation criteria.
         """
-        if len(address) < 5 or len(address) > 100:
-            raise ValueError("Address must be between 5 and 100 characters.")
+        if not ADDRESS_MIN_LENGTH <= len(address) <= ADDRESS_MAX_LENGTH:
+            raise ValueError(validation_errors["invalid_address"])
         self.value = address
 
     def __str__(self) -> str:

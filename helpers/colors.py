@@ -2,7 +2,7 @@
 Colors module.
 """
 
-from colorama import Fore, Back, init
+from colorama import Fore, Back, Style, init
 
 # Initialize Colorama
 init(autoreset=True)
@@ -17,12 +17,18 @@ def blue(text):
     return Fore.BLUE + text + Fore.RESET
 
 
+
 def yellow(text):
     return Fore.YELLOW + text + Fore.RESET
 
 
 def red(text):
     return Fore.RED + text + Fore.RESET
+
+  
+def dim(text):
+    return Style.DIM + text + Style.RESET_ALL
+
 
 
 # Colors for ********************* BackGround *********************

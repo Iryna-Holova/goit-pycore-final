@@ -8,6 +8,7 @@ from contacts.phone import Phone
 from contacts.birthday import Birthday
 from contacts.email import Email
 from contacts.address import Address
+from constants.validation import validation_errors
 
 
 class Record:
@@ -28,9 +29,6 @@ class Record:
 
         Args:
             contact_name (str): The name of the contact.
-
-        Returns:
-            None
         """
         self.name = Name(contact_name)
         self.phones: List[Phone] = []
@@ -45,15 +43,12 @@ class Record:
         Args:
             phone (str): The phone number to add.
 
-        Returns:
-            None
-
         Raises:
             ValueError: If the phone number already exists in the record.
         """
         new_phone = Phone(phone)
         if new_phone in self.phones:
-            raise ValueError(f"Phone number {phone} already exists")
+            raise ValueError(validation_errors["duplicate_phone"].format(phone))
         self.phones.append(new_phone)
 
     def remove_phone(self, phone: str) -> None:
@@ -66,34 +61,25 @@ class Record:
 
         Raises:
             ValueError: If the phone number is not found in the list of phones.
-
-        Returns:
-            None
         """
         phone_to_remove = Phone(phone)
         if phone_to_remove in self.phones:
             self.phones.remove(phone)
         else:
-            raise ValueError(f"Phone number {phone} not found")
+            raise ValueError(validation_errors["phone_not_found"].format(phone))
 
     def add_birthday(self, birthday: str) -> None:
         """
         Adds a birthday to the record.
 
         Args:
-            birthday (str): The birthday to be added in the format DD.MM.YYYY.
-
-        Returns:
-            None
+            birthday (str): The birthday to be added.
         """
         self.birthday = Birthday(birthday)
 
     def remove_birthday(self) -> None:
         """
         Removes the birthday from the record.
-
-        Returns:
-            None
         """
         self.birthday = None
 
@@ -103,18 +89,12 @@ class Record:
 
         Args:
             email (str): The email address to be added.
-
-        Returns:
-            None
         """
         self.email = Email(email)
 
     def remove_email(self) -> None:
         """
         Removes the email address from the record.
-
-        Returns:
-            None
         """
         self.email = None
 
@@ -124,9 +104,6 @@ class Record:
 
         Args:
             address (str): The address to be added.
-
-        Returns:
-            None
         """
         self.address = Address(address)
 

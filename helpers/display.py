@@ -17,19 +17,21 @@ def display_contacts(book: AddressBook) -> str:
     if not book.data:
         return "Address book is empty."
 
-    headers = ["Name", "Phones", "Birthday", "Address"]
+    headers = ["Name", "Phones", "Birthday", "Email", "Address"]
     colored_headers = [blue(header) for header in headers]
     table = []
     for contact in book.data.values():
-        phones_str = (" ".join(map(str, contact.phones))
-                      if contact.phones else " - ")
-        address = getattr(contact, 'address', None)
-        table.append([
-            str(contact.name),
-            wrap_text(phones_str),
-            str(contact.birthday) if contact.birthday else " - ",
-            wrap_text(str(address)) if address else " - "
-        ])
+        phones_str = " ".join(map(str, contact.phones)) if contact.phones else " - "
+        address = getattr(contact, "address", None)
+        table.append(
+            [
+                str(contact.name),
+                wrap_text(phones_str),
+                str(contact.birthday) if contact.birthday else " - ",
+                str(contact.email) if contact.email else " - ",
+                wrap_text(str(address)) if address else " - ",
+            ]
+        )
 
     table_str = tabulate(table, headers=colored_headers, tablefmt="grid")
 
@@ -58,6 +60,7 @@ def highlight_term(text: str, term: str, bg_color_code: str = "\033[43m") -> str
     return highlighted_text
 
 
+
 def display_contact(contact: Record, search_term: str = '') -> str:
     headers = ["Name", "Phones", "Birthday", "Address"]
     colored_headers = [green(header) for header in headers]
@@ -65,16 +68,23 @@ def display_contact(contact: Record, search_term: str = '') -> str:
     name_str = str(contact.name)
     if search_term:
         name_str = highlight_term(name_str, search_term)
+
     # Highlight the search term in phone numbers
-    phones_str = (" ".join(
-        [highlight_term(str(phone), search_term) for phone in contact.phones]
-    ) if contact.phones else " - ")
-    table = [[
-        name_str,
-        phones_str,
-        str(contact.birthday) if contact.birthday else " - ",
-        str(contact.address) if contact.address else " - "
-    ]]
+    phones_str = (
+        " ".join([highlight_term(str(phone), search_term) for phone in contact.phones])
+        if contact.phones
+        else " - "
+    )
+
+    table = [
+        [
+            name_str,
+            phones_str,
+            str(contact.birthday) if contact.birthday else " - ",
+            str(contact.email) if contact.email else " - ",
+            str(contact.address) if contact.address else " - ",
+        ]
+    ]
 
     table_str = tabulate(table, headers=colored_headers, tablefmt="grid")
     return table_str
