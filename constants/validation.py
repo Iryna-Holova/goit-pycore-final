@@ -29,5 +29,6 @@ validation_errors = {
         f"Address must consist of {ADDRESS_MIN_LENGTH} "
         f"to {ADDRESS_MAX_LENGTH} characters."
     ),
+    "duplicate_title": "Title {} already exists.",
     "invalid_number": "Please enter a valid number.",
 }

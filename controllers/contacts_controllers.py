@@ -159,7 +159,7 @@ def add_phones(contact: Record) -> None:
                 dim(questions["back"])
                 + blue(questions["phone"] + questions["skip"])
             )
-            if not phone:
+            if not phone.strip():
                 break
             contact.add_phone(phone)
             print(dim(questions["back"]) + green(info_messages["phone_added"]))
@@ -370,13 +370,6 @@ def get_contacts(book: AddressBook) -> str:
         str: A string containing the names and phone numbers of all contacts
         in the `book`.
     """
-    with Progress() as progress:
-        task = progress.add_task("[blue]Processing...", total=100)
-
-        while not progress.finished:
-            progress.update(task, advance=100)
-            sleep(0.8)
-
     if not book.data:
         return warning(info_messages["no_contacts"])
 
@@ -421,9 +414,12 @@ def fake_contacts(book: AddressBook) -> str:
     """
     while True:
         try:
-            count = input(blue(questions["contacts"]))
+            count = input(dim(questions["back"]) + blue(questions["contacts"]))
             if not count.isdigit():
-                print(warning(validation_errors["invalid_number"]))
+                print(
+                    dim(questions["back"])
+                    + warning(validation_errors["invalid_number"])
+                )
                 continue
             count = int(count)
             break
@@ -444,7 +440,7 @@ def fake_contacts(book: AddressBook) -> str:
         try:
             book.add_record(record)
         except ValueError as e:
-            print(danger(str(e)))
+            print(dim(questions["back"]) + danger(str(e)))
 
     return success(info_messages["fake_contacts_generated"])
 

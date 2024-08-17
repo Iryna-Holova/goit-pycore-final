@@ -5,14 +5,16 @@ The controllers module contains functions that interact with the user and
 modify the notes book.
 """
 
-from prompt_toolkit import PromptSession
-from helpers.colors import green, blue, success, warning, danger
-from helpers.completer import CustomCompleter
+from notes.notes_book import NotesBook
+from notes.note import Note
+from helpers.colors import green, blue, dim, success, warning, danger
 from helpers.completer import Prompt
 from helpers.generate_data import generate_random_note
 from helpers.display import display_notes, display_note, display_reminders
-from notes.notes_book import NotesBook
-from notes.note import Note
+from constants.questions import questions
+from constants.info_messages import info_messages
+from constants.commands import commands
+from constants.validation import validation_errors
 
 
 def add_note(book: NotesBook) -> str:
@@ -28,23 +30,27 @@ def add_note(book: NotesBook) -> str:
     """
     try:
         while True:
-            title = input(blue("Enter title: "))
+            title = input(dim(questions["back"]) + blue(questions["title"]))
             if title.strip().lower() in book.data:
-                print(warning("Note already exists."))
+                print(dim(questions["back"]) + warning(
+                    validation_errors["duplicate_title"]
+                ).format(title))
                 continue
             try:
                 new_note = Note(title)
                 break
             except ValueError as e:
-                print(danger(str(e)))
-        add_text(new_note)
+                print(dim(questions["back"]) + danger(str(e)))
+                continue
+
+        edit_text(new_note)
         add_tags(new_note)
-        add_reminder(new_note)
+        edit_reminder(new_note)
         book.add_note(new_note)
         print(display_note(new_note))
-        return success("Note was added.")
+        return success(info_messages["note_added"])
     except KeyboardInterrupt:
-        return danger("\nOperation canceled.")
+        return danger("\n" + info_messages["operation_cancelled"])
 
 
 def change_note(book: NotesBook) -> str:
@@ -58,60 +64,78 @@ def change_note(book: NotesBook) -> str:
         str: A message indicating whether the note was edited or not.
     """
     is_edited = False
-    session = PromptSession()
+    prompt = Prompt()
     try:
         while True:
-            title = session.prompt(
-                "Enter title: ",
-                completer=CustomCompleter(list(book)),
-                mouse_support=True,
+            question = dim(questions["back"]) + blue(questions["title"])
+            print(question, end="")
+            title = prompt.prompt(
+                " " * len(questions["back"] + questions["title"]), list(book)
             )
+            print("\033[F\033[K", end="")
+            print(f"{question}{title}")
             try:
                 note = book.find(title)
                 break
             except ValueError as e:
-                print(danger(str(e)))
+                print(dim(questions["back"]) + danger(str(e)))
                 continue
 
-        print(note)
+        print(display_note(note))
         while True:
-            commands = {
-                "edit-text": edit_text,
-                "add-tags": add_tags,
-                "add-reminder": add_reminder,
-                "remove-tag": remove_tag,
+            all_commands = {
+                commands["main_menu"]: None,
+                commands["add_tags"]: add_tags,
             }
-            print(green(f"Choose a command: {", ".join(list(commands))}"))
-            command = session.prompt(
-                "Enter a command or press Enter to quit: ",
-                completer=CustomCompleter(list(commands)),
-                mouse_support=True,
-            )
-            if not command:
-                break
-            if command in commands:
-                commands[command](note)
-                is_edited = True
-                print(note)
+            if note.add_tags:
+                all_commands[commands["remove_tag"]] = remove_tag
+            if note.text:
+                all_commands[commands["edit_text"]] = edit_text
+                all_commands["remove_text"] = remove_text
             else:
-                print(danger("Invalid command."))
+                all_commands["add_text"] = edit_text
+            if note.reminder:
+                all_commands[commands["remove_reminder"]] = remove_reminder
+                all_commands[commands["edit_reminder"]] = edit_reminder
+            else:
+                all_commands[commands["add_reminder"]] = edit_reminder
+            options = f"Options: {", ".join(list(all_commands))}"
+            print(dim(questions["back"] + options))
+            question = dim(questions["back"]) + blue(questions["command"])
+            print(question, end="")
+            n = len(questions["back"] + questions["command"])
+            command = prompt.prompt(" " * n, list(all_commands))
+            print("\033[F\033[K", end="")
+            print(f"{question}{command}")
+
+            if command == commands["main_menu"]:
+                break
+            if command in all_commands:
+                all_commands[command](note)
+                is_edited = True
+                print(display_note(note))
+            else:
+                print(
+                    dim(questions["back"])
+                    + danger(info_messages["unknown_command"])
+                )
                 continue
         return (
-            success("Note was edited.")
+            success("\n" + info_messages["note_edited"])
             if is_edited
-            else danger("\nOperation canceled.")
+            else danger(info_messages["operation_cancelled"])
         )
     except KeyboardInterrupt:
         return (
-            success("Note was edited.")
+            success("\n" + info_messages["note_edited"])
             if is_edited
-            else danger("\nOperation canceled.")
+            else danger(info_messages["operation_cancelled"])
         )
 
 
-def add_text(note: Note) -> None:
+def edit_text(note: Note) -> None:
     """
-    Adds text to the `note`.
+    Edits text in the `note`.
 
     Args:
         note (Note): An instance of the `Note` class.
@@ -121,15 +145,35 @@ def add_text(note: Note) -> None:
     """
     while True:
         try:
-            text = input(blue("Enter text or press Enter to skip: "))
+            text = input(
+                dim(questions["back"])
+                + blue(questions["text"] + questions["skip"])
+            )
             if not text:
                 break
             note.add_text(text)
-            print(green("Text added."))
+            print(
+                dim(questions["back"])
+                + green(info_messages["text_added"])
+            )
             break
         except ValueError as e:
-            print(danger(str(e)))
+            print(dim(questions["back"]) + danger(str(e)))
             continue
+
+
+def remove_text(note: Note) -> None:
+    """
+    Removes text from the `note`.
+
+    Args:
+        note (Note): An instance of the `Note` class.
+
+    Returns:
+        None
+    """
+    note.remove_text()
+    print(dim(questions["back"]) + green(info_messages["text_removed"]))
 
 
 def add_tags(note: Note) -> None:
@@ -144,56 +188,17 @@ def add_tags(note: Note) -> None:
     """
     while True:
         try:
-            tag = input(blue("Enter tags or press Enter to skip: "))
-            if not tag:
+            tags = input(
+                dim(questions["back"])
+                + blue(questions["tags"] + questions["skip"])
+            )
+            if not tags.strip():
                 break
-            note.add_tags(tag)
-            print(green("Tags added."))
+            note.add_tags(tags)
+            print(dim(questions["back"]) + green(info_messages["tags_added"]))
             break
         except ValueError as e:
-            print(danger(str(e)))
-            continue
-
-
-def get_notes(book: NotesBook) -> str:
-    """
-    Returns a string containing the title, text, tags, created_on, reminder of
-    all notes in the `book`.
-
-    Args:
-        book (NotesBook): An instance of the `NotesBook` class.
-
-    Returns:
-        str: A string containing title, text, tags, created_on, reminder of
-        all notes in the `book`.
-    """
-
-    if not book.data:
-        return warning("Notes book is empty.")
-
-    return display_notes(book)
-
-
-def edit_text(note: Note) -> None:
-    """
-    Edits the text of the `note`.
-
-    Args:
-        note (Note): An instance of the `Note` class.
-
-    Returns:
-        None
-    """
-    while True:
-        try:
-            text = input(blue("Enter text or press Enter to skip: "))
-            if not text:
-                break
-            note.add_text(text)
-            print(green("Text edited."))
-            break
-        except ValueError as e:
-            print(danger(str(e)))
+            print(dim(questions["back"]) + danger(str(e)))
             continue
 
 
@@ -208,17 +213,89 @@ def remove_tag(note: Note) -> None:
     Returns:
         None
     """
+    prompt = Prompt()
     while True:
         try:
-            tag = input(blue("Enter tag or press Enter to skip: "))
+            question = dim(questions["back"]) + blue(
+                questions["tag"] + questions["skip"]
+            )
+
+            print(question, end="")
+            n = len(questions["back"] + questions["tag"] + questions["skip"])
+            tag = prompt.prompt(" " * n, [tag.value for tag in note.tags])
+            print("\033[F\033[K", end="")
+            print(f"{question}{tag}")
             if not tag:
                 break
             note.remove_tag(tag)
-            print(green("Tag deleted."))
+            print(
+                dim(questions["back"])
+                + green(info_messages["tag_removed"])
+            )
+        except ValueError as e:
+            print(dim(questions["back"]) + danger(str(e)))
+            continue
+
+
+def edit_reminder(note: Note) -> None:
+    """
+    Edits reminder in the `note`.
+
+    Args:
+        note (Note): An instance of the `Note` class.
+
+    Returns:
+        None
+    """
+    while True:
+        try:
+            reminder = input(
+                dim(questions["back"])
+                + blue(questions["reminder"] + questions["skip"])
+            )
+            if not reminder:
+                break
+            note.set_reminder(reminder)
+            print(
+                dim(questions["back"])
+                + green(info_messages["reminder_added"])
+            )
             break
         except ValueError as e:
-            print(danger(str(e)))
+            print(dim(questions["back"]) + danger(str(e)))
             continue
+
+
+def remove_reminder(note: Note) -> None:
+    """
+    Removes reminder from the `note`.
+
+    Args:
+        note (Note): An instance of the `Note` class.
+
+    Returns:
+        None
+    """
+    note.remove_reminder()
+    print(dim(questions["back"]) + green(info_messages["reminder_removed"]))
+
+
+def get_notes(book: NotesBook) -> str:
+    """
+    Returns a string containing the title, text, tags, created_on, reminder of
+    all notes in the `book`.
+
+    Args:
+        book (NotesBook): An instance of the `NotesBook` class.
+
+    Returns:
+        str: A string containing title, text, tags, created_on, reminder of
+        all notes in the `book`.
+    """
+    if not book.data:
+        return warning(info_messages["no_notes"])
+
+    return display_notes(book)
 
 
 def delete_note(book: NotesBook) -> str:
@@ -235,38 +312,20 @@ def delete_note(book: NotesBook) -> str:
     prompt = Prompt()
     while True:
         try:
-            title = prompt.prompt("Enter title: ", list(book))
+            question = dim(questions["back"]) + blue(questions["title"])
+            print(question, end="")
+            title = prompt.prompt(
+                " " * len(questions["back"] + questions["title"]), list(book)
+            )
+            print("\033[F\033[K", end="")
+            print(f"{question}{title}")
             book.delete(title)
             break
         except ValueError as error:
-            print(warning(str(error)))
+            print(dim(questions["back"]) + danger(str(error)))
         except KeyboardInterrupt:
-            return danger("Operation canceled.")
-    return success(f"Note {title} deleted.")
-
-
-def add_reminder(note: Note) -> None:
-    """
-    Adds a reminder to the note.
-
-    Args:
-        note (Note): An instance of the `Note` class.
-
-    Returns:
-        str: A message indicating whether the reminder was added or
-        if the input is invalid.
-    """
-    while True:
-        try:
-            reminder = input(blue("Enter reminder or press Enter to skip: "))
-            if not reminder:
-                break
-            note.set_reminder(reminder)
-            print(green("Reminder added."))
-            break
-        except ValueError as e:
-            print(danger(str(e)))
-            continue
+            return danger(info_messages["operation_cancelled"])
+    return success(info_messages["note_deleted"])
 
 
 def fake_notes(book: NotesBook) -> str:
@@ -282,14 +341,17 @@ def fake_notes(book: NotesBook) -> str:
     """
     while True:
         try:
-            count = input(blue("Enter number of fake notes: "))
+            count = input(dim(questions["back"]) + blue(questions["notes"]))
             if not count.isdigit():
-                print(warning("Invalid input. Please enter a valid number."))
+                print(
+                    dim(questions["back"])
+                    + warning(validation_errors["invalid_number"])
+                )
                 continue
             count = int(count)
             break
         except KeyboardInterrupt:
-            return danger("\nOperation canceled.")
+            return danger(info_messages["operation_cancelled"])
 
     for _ in range(count):
         note_data = generate_random_note()
@@ -300,9 +362,12 @@ def fake_notes(book: NotesBook) -> str:
             note.add_tags(tag)
         if note_data["reminder"]:
             note.set_reminder(note_data["reminder"])
-        book.add_note(note)
+        try:
+            book.add_note(note)
+        except ValueError as e:
+            print(dim(questions["back"]) + danger(str(e)))
 
-    return success(f"{count} fake contacts added.")
+    return success(info_messages["fake_notes_generated"])
 
 
 def reminders(book: NotesBook) -> str:
@@ -322,12 +387,15 @@ def reminders(book: NotesBook) -> str:
         message is returned.
     """
     while True:
-        days = input(blue("Enter number of days: "))
+        days = input(dim(questions["back"]) + blue(questions["days"]))
         if not days.isdigit():
-            print(warning("Invalid input. Please enter a valid number."))
+            print(
+                dim(questions["back"])
+                + warning(validation_errors["invalid_number"])
+            )
             continue
         notes = book.upcoming_reminders(int(days))
         if not notes:
-            return warning(f"No reminders in {days} days.")
+            return warning(info_messages["no_reminders"])
 
         return display_reminders(book, int(days))

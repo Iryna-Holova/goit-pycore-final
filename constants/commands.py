@@ -20,4 +20,12 @@ commands = {
     "search_contacts": "search-contacts",
     "smart_search": "smart-search",
     "main_menu": "main-menu",
+    "add_tags": "add-tags",
+    "remove_tag": "remove-tag",
+    "add_text": "add-text",
+    "remove_text": "remove-text",
+    "edit_text": "edit-text",
+    "add_reminder": "add-reminder",
+    "remove_reminder": "remove-reminder",
+    "edit_reminder": "edit-reminder",
 }
