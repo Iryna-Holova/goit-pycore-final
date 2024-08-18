@@ -51,3 +51,24 @@ class Prompt():
                     style=color_style,
                     mouse_support=self.mouse_support
                 )
+
+    def styled_prompt(self,
+                      styled_message: list,
+                      commands: list,
+                      all_commands: bool = False) -> str:
+        """
+        Provide CLI prompt and return entered data
+        """
+        message=[]
+        styles = {}
+        for i, (msg, style) in enumerate(styled_message.items()):
+            message.append((f"class:prompt{i}", msg))
+            styles[f"prompt{i}"] = style
+
+        color_style = Style.from_dict(styles)
+        return self.session.prompt(
+                    message=message,
+                    completer=CustomCompleter(commands, all_commands),
+                    style=color_style,
+                    mouse_support=self.mouse_support
+            )
