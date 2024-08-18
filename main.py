@@ -58,6 +58,7 @@ def main():
     book = load_data("address_book.pkl", default_data=AddressBook())
     notes_book = load_data("notes_book.pkl", default_data=NotesBook())
     print_title("Welcome to the assistant bot!", red)
+    print(green(book.upcoming_birthdays(days=7, short=True)))
     commands = list(controllers) + list(notes_controllers) + ["close", "exit"]
     prompt = Prompt()
 
