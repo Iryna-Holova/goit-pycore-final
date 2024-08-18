@@ -436,30 +436,6 @@ def fake_contacts(book: AddressBook) -> str:
     return success(info_messages["fake_contacts_generated"])
 
 
-def search_contacts(book: AddressBook) -> str:
-    """
-    Searches for contacts in the `book` that match the given search term.
-
-    Args:
-        book (AddressBook): An instance of the `AddressBook` class.
-
-    Returns:
-        str: A string containing the names and phone numbers of all contacts
-        in the `book` that match the given search term.
-    """
-    while True:
-        search_term = input(blue("Enter search term (name or phone number): "))
-        if search_term.lower() == "q":
-            return danger("Operation canceled.")
-        if not search_term:
-            print(warning("Please enter a valid search term or q to exit"))
-            continue
-
-        results = book.search(search_term)
-        if results:
-            return book.display_contacts(results, search_term)
-        return warning("No contacts found matching the search term.")
-
 
 def interactive_search_with_autocomplete(book: AddressBook) -> str:
     """
