@@ -72,7 +72,23 @@ class NotesBook(UserDict):
         tag_normalized = tag.strip().lower()
         return [
             note for note in self.data.values()
-            if any(t.value.lower() == tag_normalized for t in note.tags)
+            if any(t.value in tag_normalized for t in note.tags)
+        ]
+
+    def search_notes_by_title(self, title: str) -> list[Note]:
+        """
+        Searches for notes by title.
+
+        Args:
+            title (str): The title to search for.
+
+        Returns:
+            list[Note]: A list of notes containing the title.
+        """
+        title_normalized = title.strip().lower()
+        return [
+            note for note in self.data.values()
+            if title_normalized in note.title.value.lower()
         ]
 
     def sort_notes_by_tag(self, tag: str) -> list[Note]:
@@ -90,6 +106,23 @@ class NotesBook(UserDict):
         tagged_notes = [note for note in self.data.values() if any(
             t.value.lower() == tag_normalized for t in note.tags)]
         return sorted(tagged_notes, key=lambda note: note.title.value.lower())
+
+    def sort_notes_by_title(self, ascending: bool = True) -> list[Note]:
+        """
+        Sorts all notes in the collection by their title.
+
+        Args:
+            ascending (bool): If True, sorts the notes in ascending order.
+                            If False, sorts the notes in descending order.
+
+        Returns:
+            list[Note]: A list of notes sorted by their title.
+        """
+        return sorted(
+            self.data.values(),
+            key=lambda note: note.title.value.lower(),
+            reverse=not ascending
+        )
 
     @property
     def all_tags(self) -> set:

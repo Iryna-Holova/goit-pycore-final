@@ -399,3 +399,39 @@ def reminders(book: NotesBook) -> str:
             return warning(info_messages["no_reminders"])
 
         return display_reminders(book, int(days))
+
+
+def search_notes(book: NotesBook) -> str:
+    """
+    Searches for notes in the `NotesBook` that match the given search term.
+    The search term can be a note title or a tag. If searching by tag,
+    results are sorted by the presence of the tag.
+
+    Args:
+        book (NotesBook): An instance of the `NotesBook` class.
+
+    Returns:
+        str: A string containing the notes that match the search term.
+    """
+    while True:
+        search_term = input(
+            "Enter search term (title or tag) or 'q' to quit: ").strip()
+        if search_term.lower() == "q":
+            return "Operation canceled."
+
+        if not search_term:
+            print("Please enter a valid search term or 'q' to exit.")
+            continue
+
+        results_by_title = book.search_notes_by_title(search_term)
+        if results_by_title:
+            sorted_results_by_title = book.sort_notes_by_title(
+                results_by_title)
+            return "\n".join([str(note) for note in sorted_results_by_title])
+
+        results_by_tag = book.search_notes_by_tag(search_term)
+        if results_by_tag:
+            sorted_results_by_tag = book.sort_notes_by_tag(search_term)
+            return "\n".join([str(note) for note in sorted_results_by_tag])
+
+        print("No notes found matching the search term.")
