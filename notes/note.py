@@ -107,6 +107,24 @@ class Note:
         """
         self.reminder = Reminder(remind_date)
 
+    def remove_text(self):
+        """
+        Removes the text from the note.
+
+        Returns:
+            None
+        """
+        self.text = None
+
+    def remove_reminder(self):
+        """
+        Removes the reminder from the note.
+
+        Returns:
+            None
+        """
+        self.reminder = None
+
     def __str__(self):
         """
         Returns a string containing the title, text, tags, created_on,
