@@ -48,6 +48,7 @@ class Editor(tk.Frame):
         self.pack(fill=tk.BOTH, expand=True)
         self.create_widgets()
         self.center_window(width, height)
+        self.text_entry.focus_set()
 
     def create_widgets(self) -> None:
         """
