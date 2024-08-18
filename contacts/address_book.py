@@ -144,7 +144,7 @@ class AddressBook(UserDict):
 
         return results
 
-    def smart_search(self, search_term: str, limit: int = 5) -> list:
+    def smart_search(self, search_term: str) -> list:
         """
         Smart search that finds contacts even with typos and suggests contacts
           as the user types.
@@ -165,7 +165,7 @@ class AddressBook(UserDict):
         ]
 
         # Get fuzzy matches for names
-        name_matches = process.extract(search_term, names, limit=limit)
+        name_matches = process.extract(search_term, names)
         matched_names = [
             match[0] for match in name_matches if match[1] >= 70
         ]  # 70% similarity threshold
