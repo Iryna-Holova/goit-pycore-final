@@ -16,6 +16,7 @@ from controllers.notes_controllers import (
     get_notes,
     reminders,
     fake_notes,
+    search_notes
 )
 from controllers.contacts_controllers import (
     add_contact,
@@ -45,7 +46,8 @@ notes_controllers = {
     "delete-note": delete_note,
     "all-notes": get_notes,
     "fake-notes": fake_notes,
-    "reminders": reminders
+    "reminders": reminders,
+    "search-notes": search_notes
 }
 
 
