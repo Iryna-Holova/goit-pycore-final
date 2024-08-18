@@ -55,6 +55,15 @@ Enter the command `help` to see available commands.
 
 Feel free to fork the repository and submit pull requests. Contributions are welcome!
 
+## Contributors
+
+- [Iryna Holova - Team Lead, developer](https://github.com/Iryna-Holova)
+- [Katerina Tkachenko - developer](https://github.com/TkachenkoKaterina)
+- [Yurii Filimonchuk - developer](https://github.com/filimon4uck)
+- [Anna Tsepilova - developer](https://github.com/AnnaTsepilova)
+- [Volodymyr Popov - developer](https://github.com/AppForceLab)
+- [Kostiantyn Baltakov - developer](https://github.com/Baltakov)
+
 ## Contact
 
 For any questions, please contact [Iryna Holova](https://github.com/Iryna-Holova).
