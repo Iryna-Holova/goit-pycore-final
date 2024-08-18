@@ -13,7 +13,7 @@ info_messages = {
     "email_removed": "Email removed.",
     "address_added": "Address added.",
     "address_removed": "Address removed.",
-    "no_contacts": "There are no contacts in the book.",
+    "no_contacts": "Contacts not found.",
     "upcoming_birthdays": "You have {} upcoming birthday(s) in {} days.",
     "no_birthdays": "There are no upcoming birthdays in the next {} days.",
     "fake_contacts_generated": "Fake contacts generated successfully.",

@@ -2,7 +2,11 @@
 Name field module.
 """
 
-from constants.validation import NAME_MIN_LENGTH, NAME_MAX_LENGTH, validation_errors
+from constants.validation import (
+    NAME_MIN_LENGTH,
+    NAME_MAX_LENGTH,
+    validation_errors
+)
 
 
 class Name:

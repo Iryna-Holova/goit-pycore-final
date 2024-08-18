@@ -1,93 +1,65 @@
+"""
+Display module.
+
+The display module contains functions that display data to the user.
+"""
+
 import re
 import textwrap
 from tabulate import tabulate
-
-from contacts.address_book import AddressBook
-from contacts.record import Record
 from notes.notes_book import NotesBook
 from notes.note import Note
 from helpers.colors import blue, green, yellow, warning
 
 
-def wrap_text(text, width=20):
+def wrap_text(text: str, width: int = 20) -> str:
+    """
+    Wraps the given text to a specified width using textwrap.wrap.
+
+    Args:
+        text (str): The text to wrap.
+        width (int, optional): The maximum width of each line. Defaults to 20.
+
+    Returns:
+        str: The wrapped text with lines separated by newline characters.
+    """
     return "\n".join(textwrap.wrap(str(text), width=width))
 
 
-def display_contacts(book: AddressBook) -> str:
-    if not book.data:
-        return "Address book is empty."
+def display_table(headers: list, table: list) -> str:
+    """
+    Displays a table with the given headers and data.
 
-    headers = ["Name", "Phones", "Birthday", "Email", "Address"]
+    Args:
+        headers (list): A list of column headers.
+        table (list): A list of rows, where each row is a list of values.
+
+    Returns:
+        str: The formatted table as a string.
+    """
     colored_headers = [blue(header) for header in headers]
-    table = []
-    for contact in book.data.values():
-        phones_str = " ".join(map(str, contact.phones)) if contact.phones else " - "
-        address = getattr(contact, "address", None)
-        table.append(
-            [
-                str(contact.name),
-                wrap_text(phones_str),
-                str(contact.birthday) if contact.birthday else " - ",
-                str(contact.email) if contact.email else " - ",
-                wrap_text(str(address)) if address else " - ",
-            ]
-        )
-
-    table_str = tabulate(table, headers=colored_headers, tablefmt="grid")
-
-    return table_str
+    return tabulate(table, headers=colored_headers, tablefmt="grid")
 
 
-def highlight_term(text: str, term: str, bg_color_code: str = "\033[43m") -> str:
+def highlight_term(text: str, term: str, color_code: str = "\033[43m") -> str:
     """
     Highlights the term in the text by changing the background color.
     Args:
         text (str): The text to search in.
         term (str): The term to highlight.
-        bg_color_code (str): The ANSI background color code to use for
-        highlighting
-            (default is yellow).
+        color_code (str, optional): The ANSI background color code to use for
+        highlighting (default is yellow).
     Returns:
         str: The text with the term highlighted with a background color.
     """
     term = re.escape(term)
     highlighted_text = re.sub(
         f'({term})',
-        f'{bg_color_code}\\1\033[0m',
+        f'{color_code}\\1\033[0m',
         text,
         flags=re.IGNORECASE
     )
     return highlighted_text
-
-
-
-def display_contact(contact: Record, search_term: str = '') -> str:
-    headers = ["Name", "Phones", "Birthday", "Address"]
-    colored_headers = [green(header) for header in headers]
-    # Highlight the search term in the name
-    name_str = str(contact.name)
-    if search_term:
-        name_str = highlight_term(name_str, search_term)
-
-    # Highlight the search term in phone numbers
-    phones_str = (
-        " ".join([highlight_term(str(phone), search_term) for phone in contact.phones])
-        if contact.phones
-        else " - "
-    )
-
-    table = [
-        [
-            name_str,
-            phones_str,
-            str(contact.birthday) if contact.birthday else " - ",
-            str(contact.email) if contact.email else " - ",
-            str(contact.address) if contact.address else " - ",
-        ]
-    ]
-
-    table_str = tabulate(table, headers=colored_headers, tablefmt="grid")
-    return table_str
 
 
 def display_notes(book: NotesBook) -> str:

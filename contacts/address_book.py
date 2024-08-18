@@ -2,11 +2,12 @@
 Address book module.
 """
 
+from typing import List
 from collections import UserDict
 from datetime import datetime
 from fuzzywuzzy import process
-from tabulate import tabulate
-from helpers.colors import warning, red
+from helpers.colors import warning
+from helpers.display import wrap_text, display_table, highlight_term
 from contacts.record import Record
 from constants.validation import DATE_FORMAT, validation_errors
 from constants.info_messages import info_messages
@@ -30,7 +31,8 @@ class AddressBook(UserDict):
         normalized_name = new_record.name.value.lower()
         if normalized_name in self.data:
             raise ValueError(
-                validation_errors["duplicate_name"].format(new_record.name.value)
+                validation_errors["duplicate_name"]
+                .format(new_record.name.value)
             )
         self.data[normalized_name] = new_record
 
@@ -50,7 +52,9 @@ class AddressBook(UserDict):
         normalized_name = contact_name.strip().lower()
         if normalized_name in self.data:
             return self.data[normalized_name]
-        raise ValueError(validation_errors["name_not_found"].format(contact_name))
+        raise ValueError(
+            validation_errors["name_not_found"].format(contact_name)
+        )
 
     def delete(self, contact_name: str) -> None:
         """
@@ -64,7 +68,9 @@ class AddressBook(UserDict):
         """
         normalized_name = contact_name.lower()
         if normalized_name not in self.data:
-            raise ValueError(validation_errors["name_not_found"].format(contact_name))
+            raise ValueError(
+                validation_errors["name_not_found"].format(contact_name)
+            )
         del self.data[normalized_name]
 
     def upcoming_birthdays(self, days: int, short: bool = False) -> str:
@@ -73,8 +79,8 @@ class AddressBook(UserDict):
         of users.
 
         Args:
-            book (AddressBook): An instance of the `AddressBook` class.
             days (int): The number of days to check for upcoming birthdays.
+            short (bool, optional): If True, the output will be shortened.
 
         Returns:
             dict: A dictionary with "congratulation_date" keys and
@@ -96,18 +102,23 @@ class AddressBook(UserDict):
             if (birthday_this_year - today).days < days:
                 upcoming_birthdays[birthday_this_year] = contact.name.value
 
-        sorted_birthdays = {
-            date.strftime(DATE_FORMAT): name
+        sorted_birthdays = [
+            [date.strftime(DATE_FORMAT), name]
             for date, name in sorted(upcoming_birthdays.items())
-        }
+        ]
+
+        if short:
+            return (
+                info_messages["upcoming_birthdays"]
+                .format(len(sorted_birthdays), days)
+                if sorted_birthdays else
+                info_messages["no_birthdays"].format(days)
+            )
         if not sorted_birthdays:
-            return warning(f"No birthdays in the next {days} days.")
+            return warning(info_messages["no_birthdays"].format(days))
 
-        headers = ["Date", "Name"]
-        colored_headers = [red(header) for header in headers]
-        table = [[date, name] for date, name in sorted_birthdays.items()]
-
-        return tabulate(table, headers=colored_headers, tablefmt="grid")
+        headers = ["Congratulation Date", "Name"]
+        return display_table(headers, sorted_birthdays)
 
     def search(self, search_term: str) -> list:
         """
@@ -160,7 +171,9 @@ class AddressBook(UserDict):
         ]  # 70% similarity threshold
 
         # Get matches for phone numbers
-        phone_matches = [name for phone, name in phone_numbers if search_term in phone]
+        phone_matches = [
+            name for phone, name in phone_numbers if search_term in phone
+        ]
 
         # Combine name and phone matches
         matched_names.extend(phone_matches)
@@ -174,3 +187,42 @@ class AddressBook(UserDict):
 
         # Return just the list of Record objects
         return results
+
+    @staticmethod
+    def display_contacts(
+        contacts: List[Record],
+        search_term: str = "",
+        field: str = ""
+    ) -> str:
+        """
+        Displays a list of contacts in a formatted table.
+
+        Args:
+            contacts (List[Record]): A list of Record objects to be displayed.
+            search_term (str, optional): The search term used to filter the
+            contacts.
+            field (str, optional): The field to be searched.
+
+        Returns:
+            str: A string representation of the formatted table or empty
+            message.
+        """
+        headers = ["Name", "Phones", "Birthday", "Address", "Email"]
+        table = []
+        for contact in contacts:
+            name = wrap_text(str(contact.name), width=20)
+            if search_term and not field or field == "name":
+                name = highlight_term(name, search_term)
+            phones = "\n".join(map(str, contact.phones))
+            if search_term and not field or field == "phones":
+                phones = highlight_term(phones, search_term)
+            table.append([
+                name if contact.name else "-",
+                phones if contact.phones else "-",
+                str(contact.birthday) if contact.birthday else "-",
+                (wrap_text(str(contact.address), width=40)
+                    if contact.address else "-"),
+                str(contact.email) if contact.email else "-",
+            ])
+
+        return display_table(headers, table)

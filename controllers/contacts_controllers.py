@@ -1,8 +1,8 @@
 """
-Controllers module.
+Contacts controllers module.
 
-The controllers module contains functions that interact with the user and
-modify the address book.
+The contacts controllers module contains functions that interact with the user
+and modify the address book.
 """
 
 from contacts.address_book import AddressBook
@@ -10,7 +10,6 @@ from contacts.record import Record
 from helpers.colors import green, blue, dim, success, warning, danger
 from helpers.generate_data import generate_random_contact
 from helpers.completer import Prompt
-from helpers.display import display_contacts, display_contact
 from constants.questions import questions
 from constants.info_messages import info_messages
 from constants.commands import commands
@@ -50,7 +49,7 @@ def add_contact(book: AddressBook) -> str:
         edit_email(new_record)
         edit_address(new_record)
         book.add_record(new_record)
-        print(display_contact(new_record))
+        print(book.display_contacts([new_record]))
         return success(info_messages["contact_added"])
     except KeyboardInterrupt:
         return danger("\n" + info_messages["operation_cancelled"])
@@ -84,7 +83,7 @@ def change_contact(book: AddressBook) -> str:
                 print(dim(questions["back"]) + danger(str(e)))
                 continue
 
-        print(display_contact(contact))
+        print(book.display_contacts([contact]))
         while True:
             all_commands = {
                 commands["main_menu"]: None,
@@ -121,7 +120,7 @@ def change_contact(book: AddressBook) -> str:
             if command in all_commands:
                 all_commands[command](contact)
                 is_edited = True
-                print(display_contact(contact))
+                print(book.display_contacts([contact]))
             else:
                 print(
                     dim(questions["back"])
@@ -370,8 +369,7 @@ def get_contacts(book: AddressBook) -> str:
     """
     if not book.data:
         return warning(info_messages["no_contacts"])
-
-    return display_contacts(book)
+    return book.display_contacts(book.data.values())
 
 
 # @input_error
@@ -464,7 +462,7 @@ def search_contacts(book: AddressBook) -> str:
 
         results = book.search(search_term)
         if results:
-            return "\n".join([display_contact(contact) for contact in results])
+            return book.display_contacts(results, search_term)
         return warning("No contacts found matching the search term.")
 
 
@@ -491,10 +489,7 @@ def interactive_search_with_autocomplete(book: AddressBook) -> str:
             results = book.smart_search(search_term)
             if results:
                 # Here we make sure to pass the search_term to highlight it
-                return "\n".join([
-                    display_contact(contact, search_term)
-                    for contact in results
-                ])
+                return book.display_contacts(results, search_term)
 
             print(warning("No contacts found matching the search term."))
         except KeyboardInterrupt:

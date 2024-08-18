@@ -6,8 +6,8 @@ from typing import List, Optional
 from contacts.name import Name
 from contacts.phone import Phone
 from contacts.birthday import Birthday
-from contacts.email import Email
 from contacts.address import Address
+from contacts.email import Email
 from constants.validation import validation_errors
 
 
@@ -19,8 +19,8 @@ class Record:
         name (Name): The name of the contact.
         phones (List[Phone]): The list of phone numbers in the contact.
         birthday (Birthday | None): The birthday of the contact.
-        email (Email | None): The email address of the contact.
         address (Address | None): The address of the contact.
+        email (Email | None): The email address of the contact.
     """
 
     def __init__(self, contact_name: str) -> None:
@@ -48,7 +48,9 @@ class Record:
         """
         new_phone = Phone(phone)
         if new_phone in self.phones:
-            raise ValueError(validation_errors["duplicate_phone"].format(phone))
+            raise ValueError(
+                validation_errors["duplicate_phone"].format(phone)
+            )
         self.phones.append(new_phone)
 
     def remove_phone(self, phone: str) -> None:
@@ -66,7 +68,9 @@ class Record:
         if phone_to_remove in self.phones:
             self.phones.remove(phone)
         else:
-            raise ValueError(validation_errors["phone_not_found"].format(phone))
+            raise ValueError(
+                validation_errors["phone_not_found"].format(phone)
+            )
 
     def add_birthday(self, birthday: str) -> None:
         """
@@ -82,21 +86,6 @@ class Record:
         Removes the birthday from the record.
         """
         self.birthday = None
-
-    def add_email(self, email: str) -> None:
-        """
-        Adds an email address to the record.
-
-        Args:
-            email (str): The email address to be added.
-        """
-        self.email = Email(email)
-
-    def remove_email(self) -> None:
-        """
-        Removes the email address from the record.
-        """
-        self.email = None
 
     def add_address(self, address: str) -> None:
         """
@@ -116,11 +105,17 @@ class Record:
         """
         self.address = None
 
-    def __str__(self):
-        phones_str = ", ".join(map(str, self.phones)) if self.phones else "N/A"
-        return (
-            f"name: {self.name}\n"
-            f"phones: {phones_str}\n"
-            f"birthday: {self.birthday if self.birthday else 'N/A'}\n"
-            f"address: {self.address if self.address else 'N/A'}\n"
-        )
+    def add_email(self, email: str) -> None:
+        """
+        Adds an email address to the record.
+
+        Args:
+            email (str): The email address to be added.
+        """
+        self.email = Email(email)
+
+    def remove_email(self) -> None:
+        """
+        Removes the email address from the record.
+        """
+        self.email = None
