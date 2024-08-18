@@ -68,15 +68,14 @@ def change_contact(book: AddressBook) -> str:
     """
     is_edited = False
     prompt = Prompt()
+    styled_message = {
+        questions["back"] : "lightgrey",
+        questions["name"] : "ansiblue"
+    }
     try:
         while True:
-            question = dim(questions["back"]) + blue(questions["name"])
-            print(question, end="")
-            name = prompt.prompt(
-                " " * len(questions["back"] + questions["name"]), list(book)
-            )
-            print("\033[F\033[K", end="")
-            print(f"{question}{name}")
+            name = prompt.styled_prompt(styled_message, list(book))
+
             try:
                 contact = book.find(name)
                 break
@@ -107,14 +106,14 @@ def change_contact(book: AddressBook) -> str:
                 all_commands[commands["edit_address"]] = edit_address
             else:
                 all_commands[commands["add_address"]] = edit_address
-            options = f"Options: {", ".join(list(all_commands))}"
+            options = f"Options: " + ", ".join(list(all_commands))
             print(dim(questions["back"] + options))
-            question = dim(questions["back"]) + blue(questions["command"])
-            print(question, end="")
-            n = len(questions["back"] + questions["command"])
-            command = prompt.prompt(" " * n, list(all_commands))
-            print("\033[F\033[K", end="")
-            print(f"{question}{command}")
+
+            styled_message = {
+                questions["back"] : "lightgrey",
+                questions["command"] : "ansiblue"
+            }
+            command = prompt.styled_prompt(styled_message, list(all_commands))
 
             if command == commands["main_menu"]:
                 break
@@ -177,17 +176,14 @@ def remove_phone(contact: Record) -> None:
         None
     """
     prompt = Prompt()
+    styled_message = {
+        questions["back"] : "lightgrey",
+        questions["phone"] + questions["skip"] : "ansiblue"
+    }
     while True:
         try:
-            question = dim(questions["back"]) + blue(
-                questions["phone"] + questions["skip"]
-            )
+            phone = prompt.styled_prompt(styled_message, list(map(str, contact.phones)))
 
-            print(question, end="")
-            n = len(questions["back"] + questions["phone"] + questions["skip"])
-            phone = prompt.prompt(" " * n, list(map(str, contact.phones)))
-            print("\033[F\033[K", end="")
-            print(f"{question}{phone}")
             if not phone:
                 break
             contact.remove_phone(phone)
@@ -338,15 +334,14 @@ def delete_contact(book: AddressBook) -> str:
         str: A success message indicating the deletion of the contact.
     """
     prompt = Prompt()
+    styled_message = {
+        questions["back"] : "lightgrey",
+        questions["name"] : "ansiblue"
+    }
     while True:
         try:
-            question = dim(questions["back"]) + blue(questions["name"])
-            print(question, end="")
-            name = prompt.prompt(
-                " " * len(questions["back"] + questions["name"]), list(book)
-            )
-            print("\033[F\033[K", end="")
-            print(f"{question}{name}")
+            name = prompt.styled_prompt(styled_message, list(book))
+
             book.delete(name)
             break
         except ValueError as error:
