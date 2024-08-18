@@ -146,7 +146,7 @@ class Editor(tk.Frame):
         Args:
             event (Optional[tk.Event]): The event object (unused).
         """
-        self.master.quit()
+        self.master.destroy()
 
     def center_window(self, width: int, height: int) -> None:
         """
