@@ -109,7 +109,7 @@ def change_contact(book: AddressBook) -> str:
             print(dim(questions["back"] + options))
 
             styled_message = {
-                questions["back"] : "lightgrey",
+                questions["back"] : "#a3a3a3",
                 questions["command"] : "ansiblue"
             }
             command = prompt.styled_prompt(styled_message, list(all_commands))
@@ -176,7 +176,7 @@ def remove_phone(contact: Record) -> None:
     """
     prompt = Prompt()
     styled_message = {
-        questions["back"] : "lightgrey",
+        questions["back"] : "#a3a3a3",
         questions["phone"] + questions["skip"] : "ansiblue"
     }
     while True:
@@ -334,7 +334,7 @@ def delete_contact(book: AddressBook) -> str:
     """
     prompt = Prompt()
     styled_message = {
-        questions["back"] : "lightgrey",
+        questions["back"] : "#a3a3a3",
         questions["name"] : "ansiblue"
     }
     while True:
