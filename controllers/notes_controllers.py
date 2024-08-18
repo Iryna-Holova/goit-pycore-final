@@ -1,7 +1,7 @@
 """
-Controllers module.
+Notes controllers module.
 
-The controllers module contains functions that interact with the user and
+The notes controllers module contains functions that interact with the user and
 modify the notes book.
 """
 
@@ -15,6 +15,7 @@ from constants.questions import questions
 from constants.info_messages import info_messages
 from constants.commands import commands
 from constants.validation import validation_errors
+from helpers.editor import Editor
 
 
 def add_note(book: NotesBook) -> str:
@@ -143,12 +144,13 @@ def edit_text(note: Note) -> None:
     Returns:
         None
     """
+    editor = Editor()
+    editor.master.title("Editor")
+    editor.mainloop()
     while True:
         try:
-            text = input(
-                dim(questions["back"])
-                + blue(questions["text"] + questions["skip"])
-            )
+            text = editor.result
+
             if not text:
                 break
             note.add_text(text)
@@ -247,6 +249,7 @@ def edit_reminder(note: Note) -> None:
     Returns:
         None
     """
+
     while True:
         try:
             reminder = input(

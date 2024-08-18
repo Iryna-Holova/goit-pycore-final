@@ -42,6 +42,8 @@ class Editor(tk.Frame):
             master = tk.Tk()
         super().__init__(master=master, bg="black")
         self.master: tk.Tk = master
+        self.master.lift()
+        self.master.focus_force()
         self.char_limit: int = char_limit
         self.result: str = ""
         self.initial_text: str = initial_text
@@ -135,7 +137,7 @@ class Editor(tk.Frame):
             event (Optional[tk.Event]): The event object (unused).
         """
         self.save_text()
-        self.master.quit()
+        self.master.destroy()
 
     def exit_without_saving(self, event: Optional[tk.Event]) -> None:
         """
