@@ -4,7 +4,7 @@
 
 The project is a Python-based application that focuses on managing contacts and notes, offering features like adding, editing, and deleting contacts, creating and managing notes with tags, and interacting through a command-line interface. It also incorporates Python best practices and concepts, such as decorators, to enhance functionality.
 
-![WelcomeScreencapture](welcomeScreen.png)
+![WelcomeScreencapture](welcomeScreenMotherbot.png)
 
 ## Features
 
@@ -34,11 +34,11 @@ The project is a Python-based application that focuses on managing contacts and 
    ```
 4. Activate Python virtual environment:
    ```bash
-   source .venv/Scripts/activate
+   source venv/Scripts/activate
    ```
 5. Install the required dependencies:
    ```bash
-   pip install -r requirements.txt
+   pip install motherbot
    ```
 
 ## Usage
@@ -46,7 +46,7 @@ The project is a Python-based application that focuses on managing contacts and 
 Run the main script to start the application:
 
 ```bash
-python main.py
+motherbot
 ```
 
 Enter the command `help` to see available commands.
