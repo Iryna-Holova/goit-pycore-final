@@ -34,7 +34,7 @@ def main():
     book, notes_book = load_books()
     app_settings.language = book.language
     app_settings.date_format = book.date_str_format
-    print_title("Welcome to the assistant bot!", red)
+    print_title("Welcome to the motherbot!", red)
     print(green(book.upcoming_birthdays(days=7, short=True)))
     print(green(notes_book.upcoming_reminders(days=7, short=True)))
     prompt = Prompt()
