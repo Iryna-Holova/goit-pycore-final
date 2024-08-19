@@ -34,11 +34,11 @@ The project is a Python-based application that focuses on managing contacts and 
    ```
 4. Activate Python virtual environment:
    ```bash
-   source .venv/Scripts/activate
+   source venv/Scripts/activate
    ```
 5. Install the required dependencies:
    ```bash
-   pip install -r requirements.txt
+   pip install motherbot
    ```
 
 ## Usage
@@ -46,7 +46,7 @@ The project is a Python-based application that focuses on managing contacts and 
 Run the main script to start the application:
 
 ```bash
-python main.py
+motherbot
 ```
 
 Enter the command `help` to see available commands.
