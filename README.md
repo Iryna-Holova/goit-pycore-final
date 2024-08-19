@@ -4,7 +4,7 @@
 
 The project is a Python-based application that focuses on managing contacts and notes, offering features like adding, editing, and deleting contacts, creating and managing notes with tags, and interacting through a command-line interface. It also incorporates Python best practices and concepts, such as decorators, to enhance functionality.
 
-![WelcomeScreencapture](welcomeScreen.png)
+![WelcomeScreencapture](welcomeScreenMotherbot.png)
 
 ## Features
 
